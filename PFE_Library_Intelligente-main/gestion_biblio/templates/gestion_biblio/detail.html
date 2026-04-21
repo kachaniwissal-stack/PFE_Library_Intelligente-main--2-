@@ -1,0 +1,37 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<div class="card p-5 shadow-lg border-0">
+    <div class="row align-items-center">
+        <div class="col-md-4">
+            {% if livre.image %}
+                <img src="{{ livre.image.url }}" class="img-fluid rounded shadow-lg" style="width: 100%; height: auto;">
+            {% else %}
+                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="height: 400px; font-size: 50px;">
+                    📖
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1 class="display-4 fw-bold">{{ livre.titre }}</h1>
+            <p class="fs-4">Auteur: <span class="text-primary">{{ livre.auteur }}</span></p>
+            <p>Catégorie: <span class="badge bg-dark">{{ livre.categorie }}</span></p>
+            <hr>
+            <h4>Statut: 
+                {% if livre.est_disponible %}
+                    <span class="text-success">Disponible ✅</span>
+                {% else %}
+                    <span class="text-danger">Emprunté ❌</span>
+                {% endif %}
+            </h4>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary mt-3">Retour</a>
+           {% if livre.est_disponible %}
+    <form action="{% url 'reserver_livre' livre.id %}" method="POST" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-lg">Réserver maintenant</button>
+    </form>
+{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

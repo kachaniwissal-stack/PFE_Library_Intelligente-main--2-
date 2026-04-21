@@ -1,0 +1,91 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<style>
+    /* ستايل خفيف للـ Dark Mode */
+    body.dark-mode { background-color: #1a1a1a; color: #f8f9fa; }
+    .dark-mode .card { background-color: #2d2d2d; color: white; border: 1px solid #444; }
+    .dark-mode .ai-card { background-color: #0f2027; border: 1px solid #00c6ff; }
+    .ai-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); transition: 0.3s; }
+    .book-img { height: 180px; object-fit: cover; width: 100%; border-radius: 8px 8px 0 0; }
+    .ai-img { height: 100px; object-fit: cover; border-radius: 5px; }
+</style>
+
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-primary">Smart-Biblio 📚</h1>
+            <p class="lead">Bienvenue, <span class="text-info fw-bold">{{ request.user.username|default:"Admin" }}</span></p>
+        </div>
+        <!-- بوطون Dark Mode -->
+        <button onclick="toggleDarkMode()" class="btn btn-outline-secondary shadow-sm">🌙 Mode Sombre</button>
+    </div>
+
+    <!-- SECTION IA (Recommandations) -->
+    <div class="p-4 ai-card rounded-4 mb-5 shadow-sm border-start border-info border-5">
+        <h4 class="text-primary mb-4"><i class="fas fa-magic"></i> ✨ Recommandations Personnalisées (IA)</h4>
+        <div class="row">
+            {% for livre in recommandations %}
+            <div class="col-md-3 mb-3">
+                <div class="card h-100 border-0 shadow-sm p-2 text-center">
+                    {% if livre.image %}
+                        <img src="{{ livre.image.url }}" class="ai-img mb-2 shadow-sm" alt="{{ livre.titre }}">
+                    {% else %}
+                        <div class="bg-light ai-img mb-2 d-flex align-items-center justify-content-center text-muted">No Image</div>
+                    {% endif %}
+                    <h6 class="text-truncate">{{ livre.titre }}</h6>
+                    <span class="badge bg-primary-subtle text-primary mb-2">{{ livre.categorie }}</span>
+                    <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-info text-white">Voir</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted w-100">L'IA prépare vos recommandations...</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- MOTEUR DE RECHERCHE -->
+    <div class="row mb-5">
+        <div class="col-md-7 mx-auto">
+            <form method="GET" action="{% url 'home' %}" class="d-flex">
+                <div class="input-group shadow-sm">
+                    <input name="q" class="form-control border-0 p-3" type="search" placeholder="Titre, auteur, genre..." value="{{ query|default:'' }}">
+                    <button class="btn btn-primary px-4" type="submit">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CATALOGUE -->
+    <h3 class="mb-4">📚 Catalogue des Livres</h3>
+    <div class="row">
+        {% for livre in livres %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-0 overflow-hidden">
+                {% if livre.image %}
+                    <img src="{{ livre.image.url }}" class="book-img" alt="{{ livre.titre }}">
+                {% else %}
+                    <div class="bg-secondary-subtle book-img d-flex align-items-center justify-content-center text-muted">📖 Pas d'image</div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-truncate">{{ livre.titre }}</h5>
+                    <p class="text-muted small mb-3">Par: <strong>{{ livre.auteur }}</strong></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge rounded-pill {% if livre.est_disponible %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
+                            ● {% if livre.est_disponible %}Disponible{% else %}Indisponible{% endif %}
+                        </span>
+                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">Explorer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+</script>
+{% endblock %}

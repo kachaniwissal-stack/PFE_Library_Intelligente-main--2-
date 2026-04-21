@@ -1,0 +1,43 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<div class="bg-white p-4 rounded shadow">
+    <h2 class="mb-4">👤 Mon Espace Étudiant</h2>
+    <h5 class="text-muted mb-4">Mes emprunts actuels et passés :</h5>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Livre</th>
+                    <th>Date d'emprunt</th>
+                    <th>Date retour prévue</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprunt in emprunts %}
+                <tr>
+                    <td><strong>{{ emprunt.livre.titre }}</strong></td>
+                    <td>{{ emprunt.date_emprunt }}</td>
+                    <td>{{ emprunt.date_retour_prevue }}</td>
+                    <td>
+                        {% if emprunt.statut == 'en cours' %}
+                            <span class="badge bg-primary">En cours</span>
+                        {% elif emprunt.statut == 'en retard' %}
+                            <span class="badge bg-danger">EN RETARD</span>
+                        {% else %}
+                            <span class="badge bg-success">Rendu</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5">Aucun emprunt trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

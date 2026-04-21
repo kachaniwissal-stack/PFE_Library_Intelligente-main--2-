@@ -1,0 +1,72 @@
+[
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "Atomic Habits",
+      "auteur": "James Clear",
+      "isbn": "9780735211292",
+      "categorie": "Développement",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "The 5 AM Club",
+      "auteur": "Robin Sharma",
+      "isbn": "9781443456623",
+      "categorie": "Développement",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "Artificial Intelligence",
+      "auteur": "Stuart Russell",
+      "isbn": "9780136042594",
+      "categorie": "Informatique",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "Introduction to Algorithms",
+      "auteur": "Thomas Cormen",
+      "isbn": "9780262033848",
+      "categorie": "Informatique",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "The Pragmatic Programmer",
+      "auteur": "Andrew Hunt",
+      "isbn": "9780201616224",
+      "categorie": "Informatique",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "L'Étranger",
+      "auteur": "Albert Camus",
+      "isbn": "9782070360024",
+      "categorie": "Roman",
+      "est_disponible": true
+    }
+  },
+  {
+    "model": "gestion_biblio.livre",
+    "fields": {
+      "titre": "1984",
+      "auteur": "George Orwell",
+      "isbn": "9782070409228",
+      "categorie": "Roman",
+      "est_disponible": true
+    }
+  }
+]
