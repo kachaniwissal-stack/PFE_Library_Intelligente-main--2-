@@ -1,36 +1,38 @@
 {% extends "gestion_biblio/base.html" %}
 
 {% block content %}
-<div class="card p-5 shadow-lg border-0">
-    <div class="row align-items-center">
-        <div class="col-md-4">
+<div class="container mt-5">
+    <div class="row bg-white p-4 rounded-4 shadow-sm">
+        <!-- تصويرة الكتاب -->
+        <div class="col-md-4 text-center">
             {% if livre.image %}
-                <img src="{{ livre.image.url }}" class="img-fluid rounded shadow-lg" style="width: 100%; height: auto;">
+                <img src="{{ livre.image.url }}" class="img-fluid rounded-3 shadow" style="max-height: 400px;">
             {% else %}
-                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="height: 400px; font-size: 50px;">
-                    📖
-                </div>
+                <div class="bg-light p-5 rounded">📖 Pas d'image</div>
             {% endif %}
         </div>
+
+        <!-- معلومات الكتاب -->
         <div class="col-md-8">
-            <h1 class="display-4 fw-bold">{{ livre.titre }}</h1>
-            <p class="fs-4">Auteur: <span class="text-primary">{{ livre.auteur }}</span></p>
-            <p>Catégorie: <span class="badge bg-dark">{{ livre.categorie }}</span></p>
+            <h1 class="fw-bold text-primary">{{ livre.titre }}</h1>
+            <h5 class="text-muted mb-4">Par : <strong>{{ livre.auteur }}</strong></h5>
+            
+            <span class="badge bg-info text-dark px-3 py-2 mb-4">{{ livre.categorie }}</span>
+            <p><strong>ISBN :</strong> {{ livre.isbn }}</p>
+
             <hr>
-            <h4>Statut: 
-                {% if livre.est_disponible %}
-                    <span class="text-success">Disponible ✅</span>
-                {% else %}
-                    <span class="text-danger">Emprunté ❌</span>
-                {% endif %}
-            </h4>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary mt-3">Retour</a>
-           {% if livre.est_disponible %}
-    <form action="{% url 'reserver_livre' livre.id %}" method="POST" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success btn-lg">Réserver maintenant</button>
-    </form>
-{% endif %}
+            <!-- هادي هي الـ Description -->
+            <h4 class="fw-bold mt-4">Résumé du livre</h4>
+            <p class="lead text-secondary" style="line-height: 1.8;">
+                {{ livre.description|default:"Désolé, aucun résumé n'est encore disponible pour cet ouvrage." }}
+            </p>
+
+            <div class="mt-5">
+                <a href="{% url 'reserver_livre' livre.id %}" class="btn btn-success btn-lg px-5 rounded-pill shadow">
+                    <i class="fas fa-bookmark me-2"></i> Réserver maintenant
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg ms-2 rounded-pill">Retour</a>
+            </div>
         </div>
     </div>
 </div>

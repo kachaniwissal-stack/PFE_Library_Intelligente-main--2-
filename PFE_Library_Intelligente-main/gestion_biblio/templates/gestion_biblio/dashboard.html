@@ -1,0 +1,113 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<style>
+    /* خلفية متدرجة خفيفة */
+    .dashboard-container { padding: 40px 0; animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ستايل المربعات (Cards) المطور */
+    .stat-card { border: none; border-radius: 20px; transition: 0.4s; position: relative; overflow: hidden; color: white; }
+    .stat-card:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+    
+    .bg-total { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+    .bg-dispo { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .bg-emprunt { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+
+    .stat-icon { position: absolute; right: -10px; bottom: -10px; font-size: 80px; opacity: 0.2; transform: rotate(-15deg); }
+    .stat-value { font-size: 3rem; font-weight: 800; margin-bottom: 0; }
+    .stat-label { font-weight: 500; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; }
+
+    /* حاوية المبيان */
+    .chart-container { background: white; border-radius: 25px; padding: 30px; border: 1px solid #edf2f7; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
+    .list-item { border-radius: 12px; margin-bottom: 10px; border: none; background: #f8fafc; transition: 0.3s; }
+    .list-item:hover { background: #f1f5f9; }
+</style>
+
+<div class="dashboard-container">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-dark">📊 Analyse Stratégique</h1>
+        <p class="text-muted">Vision globale des performances de la bibliothèque</p>
+    </div>
+
+    <!-- مربعات الإحصائيات المطورة -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card stat-card bg-total shadow-sm p-4">
+                <i class="fas fa-book stat-icon"></i>
+                <p class="stat-label">Inventaire Total</p>
+                <h2 class="stat-value">{{ total }}</h2>
+                <small>Livres enregistrés</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card bg-dispo shadow-sm p-4">
+                <i class="fas fa-check-circle stat-icon"></i>
+                <p class="stat-label">Disponibles</p>
+                <h2 class="stat-value">{{ disponibles }}</h2>
+                <small>Prêts pour lecture</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card bg-emprunt shadow-sm p-4">
+                <i class="fas fa-clock stat-icon"></i>
+                <p class="stat-label">En Circulation</p>
+                <h2 class="stat-value">{{ empruntes }}</h2>
+                <small>Emprunts actifs</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- المبيان الدائري -->
+        <div class="col-md-6 mb-4">
+            <div class="chart-container h-100">
+                <h5 class="fw-bold mb-4 text-secondary"><i class="fas fa-chart-pie me-2"></i> Répartition des Genres</h5>
+                <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+
+        <!-- لستة التفاصيل -->
+        <div class="col-md-6 mb-4">
+            <div class="chart-container h-100">
+                <h5 class="fw-bold mb-4 text-secondary"><i class="fas fa-list-ul me-2"></i> Volume par Catégorie</h5>
+                <div class="pe-2" style="max-height: 350px; overflow-y: auto;">
+                    {% for stat in stats %}
+                    <div class="list-item p-3 d-flex align-items-center justify-content-between shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle p-2 me-3 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                {{ stat.categorie|slice:":1"|upper }}
+                            </div>
+                            <span class="fw-bold text-dark">{{ stat.categorie }}</span>
+                        </div>
+                        <span class="badge bg-dark rounded-pill px-3">{{ stat.total_cat }} livres</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut', /* رجعناه Doughnut حيت كيبان عصري كثر من Pie العادي */
+        data: {
+            labels: [{% for stat in stats %}"{{ stat.categorie }}",{% endfor %}],
+            datasets: [{
+                data: [{% for stat in stats %}{{ stat.total_cat }},{% endfor %}],
+                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
+                borderWidth: 0,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            cutout: '70%', /* هادي هي لي كتخلي الدائرة خاوية من الوسط وكتجي واعرة */
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            }
+        }
+    });
+</script>
+{% endblock %}

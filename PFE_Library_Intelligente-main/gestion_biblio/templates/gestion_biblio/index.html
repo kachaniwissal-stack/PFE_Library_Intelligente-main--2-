@@ -2,90 +2,80 @@
 
 {% block content %}
 <style>
-    /* ستايل خفيف للـ Dark Mode */
-    body.dark-mode { background-color: #1a1a1a; color: #f8f9fa; }
-    .dark-mode .card { background-color: #2d2d2d; color: white; border: 1px solid #444; }
-    .dark-mode .ai-card { background-color: #0f2027; border: 1px solid #00c6ff; }
-    .ai-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); transition: 0.3s; }
-    .book-img { height: 180px; object-fit: cover; width: 100%; border-radius: 8px 8px 0 0; }
-    .ai-img { height: 100px; object-fit: cover; border-radius: 5px; }
+    /* Hero Section */
+    .hero { background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; color: white; padding: 100px 0; border-radius: 30px; margin-bottom: 50px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    
+    /* AI Card */
+    .ai-box { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 25px; padding: 30px; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3); }
+    
+    /* Book Cards */
+    .book-card { border: none; border-radius: 20px; overflow: hidden; transition: 0.4s; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .book-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .book-img { height: 280px; object-fit: cover; }
+    .btn-details { background: var(--secondary); color: white; border-radius: 12px; transition: 0.3s; }
+    .btn-details:hover { background: var(--primary); }
 </style>
 
-<div class="row">
-    <div class="col-12 d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h1 class="display-5 fw-bold text-primary">Smart-Biblio 📚</h1>
-            <p class="lead">Bienvenue, <span class="text-info fw-bold">{{ request.user.username|default:"Admin" }}</span></p>
-        </div>
-        <!-- بوطون Dark Mode -->
-        <button onclick="toggleDarkMode()" class="btn btn-outline-secondary shadow-sm">🌙 Mode Sombre</button>
+<!-- Hero Section -->
+<div class="hero">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">L'Avenir de la Lecture 📚</h1>
+        <p class="fs-4 opacity-75 mb-4">Découvrez une bibliothèque augmentée par l'Intelligence Artificielle.</p>
+        <a href="#catalogue" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow">Explorer le Catalogue</a>
     </div>
+</div>
 
-    <!-- SECTION IA (Recommandations) -->
-    <div class="p-4 ai-card rounded-4 mb-5 shadow-sm border-start border-info border-5">
-        <h4 class="text-primary mb-4"><i class="fas fa-magic"></i> ✨ Recommandations Personnalisées (IA)</h4>
-        <div class="row">
-            {% for livre in recommandations %}
-            <div class="col-md-3 mb-3">
-                <div class="card h-100 border-0 shadow-sm p-2 text-center">
-                    {% if livre.image %}
-                        <img src="{{ livre.image.url }}" class="ai-img mb-2 shadow-sm" alt="{{ livre.titre }}">
-                    {% else %}
-                        <div class="bg-light ai-img mb-2 d-flex align-items-center justify-content-center text-muted">No Image</div>
-                    {% endif %}
-                    <h6 class="text-truncate">{{ livre.titre }}</h6>
-                    <span class="badge bg-primary-subtle text-primary mb-2">{{ livre.categorie }}</span>
-                    <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-info text-white">Voir</a>
-                </div>
-            </div>
-            {% empty %}
-            <p class="text-center text-muted w-100">L'IA prépare vos recommandations...</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- MOTEUR DE RECHERCHE -->
-    <div class="row mb-5">
-        <div class="col-md-7 mx-auto">
-            <form method="GET" action="{% url 'home' %}" class="d-flex">
-                <div class="input-group shadow-sm">
-                    <input name="q" class="form-control border-0 p-3" type="search" placeholder="Titre, auteur, genre..." value="{{ query|default:'' }}">
-                    <button class="btn btn-primary px-4" type="submit">Rechercher</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- CATALOGUE -->
-    <h3 class="mb-4">📚 Catalogue des Livres</h3>
+<!-- Recommandations IA -->
+<div class="ai-box">
+    <h3 class="fw-bold mb-4"><i class="fas fa-sparkles"></i> Choisi spécialement pour vous</h3>
     <div class="row">
-        {% for livre in livres %}
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100 border-0 overflow-hidden">
+        {% for livre in recommandations %}
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 bg-white bg-opacity-10 border-0 text-white text-center p-3" style="backdrop-filter: blur(5px);">
                 {% if livre.image %}
-                    <img src="{{ livre.image.url }}" class="book-img" alt="{{ livre.titre }}">
-                {% else %}
-                    <div class="bg-secondary-subtle book-img d-flex align-items-center justify-content-center text-muted">📖 Pas d'image</div>
+                    <img src="{{ livre.image.url }}" class="rounded-3 mb-3 shadow-sm" style="height: 120px; object-fit: cover;">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title fw-bold text-truncate">{{ livre.titre }}</h5>
-                    <p class="text-muted small mb-3">Par: <strong>{{ livre.auteur }}</strong></p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="badge rounded-pill {% if livre.est_disponible %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
-                            ● {% if livre.est_disponible %}Disponible{% else %}Indisponible{% endif %}
-                        </span>
-                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">Explorer</a>
-                    </div>
-                </div>
+                <h6 class="text-truncate">{{ livre.titre }}</h6>
+                <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-light rounded-pill mt-2">Détails</a>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<script>
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-    }
-</script>
+<!-- Search & Catalogue -->
+<div id="catalogue" class="d-flex justify-content-between align-items-center mb-5">
+    <h2 class="fw-bold">📚 Notre Collection</h2>
+    <form method="GET" style="width: 350px;">
+        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+            <input name="q" class="form-control border-0 p-3" type="search" placeholder="Rechercher un livre..." value="{{ query|default:'' }}">
+            <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    {% for livre in livres %}
+    <div class="col-md-4 mb-5">
+        <div class="card book-card h-100">
+            {% if livre.image %}
+                <img src="{{ livre.image.url }}" class="book-img" alt="{{ livre.titre }}">
+            {% else %}
+                <div class="book-img bg-secondary d-flex align-items-center justify-content-center text-white">Pas d'image</div>
+            {% endif %}
+            <div class="card-body p-4 text-center">
+                <span class="badge bg-primary-subtle text-primary rounded-pill mb-2 px-3">{{ livre.categorie }}</span>
+                <h4 class="fw-bold mb-2">{{ livre.titre }}</h4>
+                <p class="text-muted mb-4 small">Par {{ livre.auteur }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold {% if livre.est_disponible %}text-success{% else %}text-danger{% endif %}">
+                        {% if livre.est_disponible %}● En Stock{% else %}● Réservé{% endif %}
+                    </span>
+                    <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details px-4 shadow-sm">Détails</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -1,43 +1,60 @@
 {% extends "gestion_biblio/base.html" %}
 
 {% block content %}
-<div class="bg-white p-4 rounded shadow">
-    <h2 class="mb-4">👤 Mon Espace Étudiant</h2>
-    <h5 class="text-muted mb-4">Mes emprunts actuels et passés :</h5>
-
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Livre</th>
-                    <th>Date d'emprunt</th>
-                    <th>Date retour prévue</th>
-                    <th>Statut</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for emprunt in emprunts %}
-                <tr>
-                    <td><strong>{{ emprunt.livre.titre }}</strong></td>
-                    <td>{{ emprunt.date_emprunt }}</td>
-                    <td>{{ emprunt.date_retour_prevue }}</td>
-                    <td>
-                        {% if emprunt.statut == 'en cours' %}
-                            <span class="badge bg-primary">En cours</span>
-                        {% elif emprunt.statut == 'en retard' %}
-                            <span class="badge bg-danger">EN RETARD</span>
-                        {% else %}
-                            <span class="badge bg-success">Rendu</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center py-5">Aucun emprunt trouvé.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container mt-5">
+    <div class="bg-white p-5 rounded-4 shadow-sm border-top border-primary border-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold"><i class="fas fa-user-graduate text-primary me-2"></i> Mon Espace Personnel</h2>
+            <span class="badge bg-light text-dark border p-2">Session : {{ request.user.username }}</span>
+        </div>
+        
+        <p class="text-muted mb-5">Retrouvez ici l'état de vos emprunts et les éventuelles pénalités de retard.</p>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Livre</th>
+                        <th>Date d'emprunt</th>
+                        <th>Date de retour prévue</th>
+                        <th>Statut</th>
+                        <th class="text-danger">Amende (DH)</th> <!-- الخانة الجديدة -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emprunt in emprunts %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ emprunt.exemplaire.livre.titre }}</span>
+                        </td>
+                        <td>{{ emprunt.date_emprunt }}</td>
+                        <td>{{ emprunt.date_retour_prevue }}</td>
+                        <td>
+                            {% if emprunt.statut == 'en cours' %}
+                                <span class="badge bg-primary rounded-pill">En cours</span>
+                            {% elif emprunt.statut == 'en retard' %}
+                                <span class="badge bg-danger rounded-pill">En retard</span>
+                            {% else %}
+                                <span class="badge bg-success rounded-pill">Rendu</span>
+                            {% endif %}
+                        </td>
+                        <!-- هنا كتبان الغرامة -->
+                        <td class="fw-bold text-center">
+                            {% if emprunt.amende > 0 %}
+                                <span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> {{ emprunt.amende }} DH</span>
+                            {% else %}
+                                <span class="text-muted">0 DH</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">Aucun emprunt enregistré.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
