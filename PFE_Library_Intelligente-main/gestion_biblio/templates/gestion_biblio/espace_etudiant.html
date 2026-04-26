@@ -1,55 +1,78 @@
 {% extends "gestion_biblio/base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="bg-white p-5 rounded-4 shadow-sm border-top border-primary border-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold"><i class="fas fa-user-graduate text-primary me-2"></i> Mon Espace Personnel</h2>
-            <span class="badge bg-light text-dark border p-2">Session : {{ request.user.username }}</span>
+<style>
+    .table-card { border-radius: 25px; border: none; overflow: hidden; background: white; }
+    .status-badge { padding: 8px 16px; font-weight: 600; font-size: 0.85rem; }
+    .btn-annuler { transition: 0.3s; border-radius: 12px; font-weight: 600; font-size: 0.8rem; }
+    .btn-annuler:hover { transform: scale(1.05); }
+    .amende-text { color: #ef4444; font-weight: 700; }
+</style>
+
+<div class="container mt-5 mb-5" data-aos="fade-up">
+    <div class="card table-card shadow-lg p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold text-dark"><i class="fas fa-user-circle text-primary me-2"></i> Mon Espace Étudiant</h2>
+                <p class="text-muted mb-0">Suivez vos réservations et gérez vos emprunts en temps réel.</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-primary-subtle text-primary p-2 px-3 rounded-pill border">
+                    <i class="fas fa-id-card me-1"></i> {{ request.user.username }}
+                </span>
+            </div>
         </div>
-        
-        <p class="text-muted mb-5">Retrouvez ici l'état de vos emprunts et les éventuelles pénalités de retard.</p>
-        
+
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Livre</th>
-                        <th>Date d'emprunt</th>
-                        <th>Date de retour prévue</th>
-                        <th>Statut</th>
-                        <th class="text-danger">Amende (DH)</th> <!-- الخانة الجديدة -->
+                <thead class="bg-light">
+                    <tr class="text-secondary small text-uppercase fw-bold">
+                        <th class="py-3 border-0">Livre</th>
+                        <th class="py-3 border-0">Date d'emprunt</th>
+                        <th class="py-3 border-0">Date retour prévue</th>
+                        <th class="py-3 border-0 text-center">Statut / Action</th>
+                        <th class="py-3 border-0 text-end text-danger">Pénalités (DH)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for emprunt in emprunts %}
                     <tr>
-                        <td>
-                            <span class="fw-bold">{{ emprunt.exemplaire.livre.titre }}</span>
+                        <td class="py-4">
+                            <span class="fw-bold text-dark fs-5">{{ emprunt.exemplaire.livre.titre }}</span>
                         </td>
-                        <td>{{ emprunt.date_emprunt }}</td>
-                        <td>{{ emprunt.date_retour_prevue }}</td>
-                        <td>
+                        <td class="text-muted">{{ emprunt.date_emprunt }}</td>
+                        <td class="text-muted">{{ emprunt.date_retour_prevue }}</td>
+                        <td class="text-center">
                             {% if emprunt.statut == 'en cours' %}
-                                <span class="badge bg-primary rounded-pill">En cours</span>
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="badge bg-primary status-badge rounded-pill">En cours</span>
+                                    <!-- بوطون الإلغاء الذكي -->
+                                    <a href="{% url 'annuler_reservation' emprunt.id %}" class="btn btn-outline-danger btn-sm btn-annuler px-3 shadow-sm">
+                                        <i class="fas fa-times me-1"></i> Annuler
+                                    </a>
+                                </div>
                             {% elif emprunt.statut == 'en retard' %}
-                                <span class="badge bg-danger rounded-pill">En retard</span>
+                                <span class="badge bg-danger status-badge rounded-pill">En retard</span>
                             {% else %}
-                                <span class="badge bg-success rounded-pill">Rendu</span>
+                                <span class="badge bg-success status-badge rounded-pill">Rendu</span>
                             {% endif %}
                         </td>
-                        <!-- هنا كتبان الغرامة -->
-                        <td class="fw-bold text-center">
+                        <td class="text-end py-4">
                             {% if emprunt.amende > 0 %}
-                                <span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> {{ emprunt.amende }} DH</span>
+                                <span class="amende-text"><i class="fas fa-exclamation-triangle me-1"></i> {{ emprunt.amende }} DH</span>
                             {% else %}
-                                <span class="text-muted">0 DH</span>
+                                <span class="text-muted opacity-50">0 DH</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">Aucun emprunt enregistré.</td>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="py-4 text-muted opacity-50">
+                                <i class="fas fa-book-open fa-4x mb-3"></i>
+                                <p class="fs-5">Vous n'avez pas encore de réservations.</p>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

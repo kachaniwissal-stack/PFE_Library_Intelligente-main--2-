@@ -1,0 +1,52 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5" data-aos="zoom-in">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4 p-5">
+            <h2 class="fw-bold text-center text-primary mb-4">Créer votre Compte Étudiant 🎓</h2>
+            
+            <!-- تنبيه بالأخطاء العامة إن وجدت -->
+            {% if form.errors %}
+                <div class="alert alert-danger rounded-3 small">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Veuillez corriger les erreurs ci-dessous.
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                        <!-- إظهار خطأ كل خانة بوحدها (مثلا لو السمية مأخوذة) -->
+                        {% for error in field.errors %}
+                            <small class="text-danger d-block mt-1"><i class="fas fa-times-circle"></i> {{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 mt-3 fw-bold shadow">
+                    S'inscrire et Réserver <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <!-- هنا فين كان المشكل، دابا رديناه كيدي لصفحة login ديال الطلبة ماشي ديال admin -->
+            <p class="text-center mt-4 small text-muted">
+                Vous avez déjà un compte ? <a href="{% url 'login' %}" class="fw-bold text-decoration-none text-primary">Se connecter</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* تحسين شكل الخانات (Inputs & Selects) */
+    input, select { 
+        border-radius: 12px !important; 
+        border: 1.5px solid #e2e8f0 !important; 
+        padding: 12px !important; 
+        width: 100%; 
+        transition: 0.3s;
+    }
+    input:focus, select:focus { border-color: #4f46e5 !important; box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.1) !important; outline: none; }
+</style>
+{% endblock %}

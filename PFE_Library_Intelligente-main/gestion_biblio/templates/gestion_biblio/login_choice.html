@@ -1,0 +1,40 @@
+{% extends "gestion_biblio/base.html" %}
+{% block content %}
+<div class="container mt-5 py-5">
+    <div class="text-center mb-5" data-aos="fade-down">
+        <h1 class="fw-bold">Bienvenue sur Smart-Biblio</h1>
+        <p class="text-muted">Veuillez sélectionner votre type de compte pour continuer</p>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        <!-- خيار الطالب -->
+        <div class="col-md-4" data-aos="fade-right">
+            <div class="card h-100 border-0 shadow-lg text-center p-4 rounded-4 hover-zoom">
+                <div class="py-4">
+                    <i class="fas fa-user-graduate fa-5x text-primary mb-4"></i>
+                    <h3 class="fw-bold">Étudiant</h3>
+                    <p class="text-muted small">Accédez à votre espace, réservez des livres et consultez vos alertes.</p>
+                </div>
+                <a href="{% url 'login' %}" class="btn btn-primary rounded-pill py-2 fw-bold">Espace Étudiant</a>
+            </div>
+        </div>
+
+        <!-- خيار المدير (Admin) -->
+        <div class="col-md-4" data-aos="fade-left">
+            <div class="card h-100 border-0 shadow-lg text-center p-4 rounded-4 hover-zoom">
+                <div class="py-4">
+                    <i class="fas fa-user-shield fa-5x text-dark mb-4"></i>
+                    <h3 class="fw-bold">Bibliothécaire</h3>
+                    <p class="text-muted small">Gérez le stock, validez les emprunts et suivez les statistiques.</p>
+                </div>
+                <a href="/admin/" class="btn btn-dark rounded-pill py-2 fw-bold">Interface Admin</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-zoom { transition: 0.3s; }
+    .hover-zoom:hover { transform: translateY(-10px); border: 2px solid #4f46e5 !important; }
+</style>
+{% endblock %}

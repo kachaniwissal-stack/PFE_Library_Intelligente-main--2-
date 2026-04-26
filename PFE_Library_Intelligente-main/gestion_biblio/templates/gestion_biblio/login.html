@@ -1,0 +1,59 @@
+{% extends "gestion_biblio/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5" data-aos="zoom-in">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-4 p-5">
+            <h2 class="fw-bold text-center text-primary mb-4">Connexion Étudiant 👤</h2>
+            
+            <!-- --- اللعبة الجديدة: إظهار رسالة الخطأ --- -->
+            {% if form.errors %}
+                <div class="alert alert-danger rounded-4 shadow-sm border-0 mb-4 animate__animated animate__shakeX" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span class="small">Identifiants incorrects. Veuillez vérifier votre nom d'utilisateur ou mot de passe.</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Nom d'utilisateur</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-user text-muted"></i></span>
+                        <input type="text" name="username" class="form-control bg-light border-0 p-3" placeholder="Ex: atif" required>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-secondary">Mot de passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" name="password" class="form-control bg-light border-0 p-3" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-lg">
+                    Se connecter <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+            
+            <p class="text-center mt-4 small text-muted">
+                Pas encore de compte ? <a href="{% url 'register' %}" class="fw-bold text-decoration-none text-primary">Créer un profil</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* تحسين شكل الخانات */
+    .form-control:focus {
+        background-color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1);
+        border: 1px solid var(--primary) !important;
+    }
+    .input-group-text { border-radius: 15px 0 0 15px !important; }
+    .form-control { border-radius: 0 15px 15px 0 !important; }
+</style>
+{% endblock %}

@@ -2,80 +2,132 @@
 
 {% block content %}
 <style>
-    /* Hero Section */
-    .hero { background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; color: white; padding: 100px 0; border-radius: 30px; margin-bottom: 50px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    /* Hero Section Premium */
+    .hero-premium {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        border-radius: 40px;
+        padding: 100px 20px;
+        margin-bottom: 60px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+    }
+    .hero-premium h1 { font-size: 3.5rem; font-weight: 800; background: linear-gradient(to right, #fff, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
-    /* AI Card */
-    .ai-box { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border-radius: 25px; padding: 30px; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3); }
-    
-    /* Book Cards */
-    .book-card { border: none; border-radius: 20px; overflow: hidden; transition: 0.4s; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    /* Glassmorphism for AI Box */
+    .ai-glass {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        padding: 40px;
+        margin-bottom: 60px;
+    }
+
+    /* Modern Book Cards */
+    .book-card { border: none; border-radius: 25px; overflow: hidden; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
     .book-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-    .book-img { height: 280px; object-fit: cover; }
-    .btn-details { background: var(--secondary); color: white; border-radius: 12px; transition: 0.3s; }
-    .btn-details:hover { background: var(--primary); }
+    .book-img { height: 320px; object-fit: cover; transition: 0.5s; }
+    .book-card:hover .book-img { transform: scale(1.05); }
+    
+    .stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 10px; }
+    .btn-details { background: #0f172a; color: white; border-radius: 15px; padding: 10px 25px; transition: 0.3s; font-weight: 600; }
+    .btn-details:hover { background: #4f46e5; color: white; transform: scale(1.05); }
+
+    .search-pill { background: white; border-radius: 50px; padding: 5px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
 </style>
 
-<!-- Hero Section -->
-<div class="hero">
-    <div class="container">
-        <h1 class="display-3 fw-bold mb-3">L'Avenir de la Lecture 📚</h1>
-        <p class="fs-4 opacity-75 mb-4">Découvrez une bibliothèque augmentée par l'Intelligence Artificielle.</p>
-        <a href="#catalogue" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow">Explorer le Catalogue</a>
+<!-- Hero Section (data-aos: حركة للصعود) -->
+<div class="hero-premium text-center shadow-lg" data-aos="zoom-out-up">
+    <div class="container py-4">
+        <h1 class="mb-3">L'Intelligence au Service du Savoir 📚</h1>
+        <p class="fs-4 opacity-75 mb-5 mx-auto" style="max-width: 700px;">Explorez une vaste collection d'ouvrages assistée par nos algorithmes de recommandation avancés.</p>
+        <a href="#catalogue" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-lg py-3">Explorer la Collection</a>
     </div>
 </div>
 
-<!-- Recommandations IA -->
-<div class="ai-box">
-    <h3 class="fw-bold mb-4"><i class="fas fa-sparkles"></i> Choisi spécialement pour vous</h3>
+<!-- Recommandations IA (data-aos: حركة من اليمين) -->
+<div class="ai-glass shadow-sm" data-aos="fade-right">
+    <h3 class="fw-bold mb-4 text-primary"><i class="fas fa-sparkles text-warning me-2"></i> Choisi par notre IA pour vous</h3>
     <div class="row">
         {% for livre in recommandations %}
-        <div class="col-md-3 mb-3">
-            <div class="card h-100 bg-white bg-opacity-10 border-0 text-white text-center p-3" style="backdrop-filter: blur(5px);">
+        <div class="col-md-3 mb-3" data-aos="flip-left" data-aos-delay="{{ forloop.counter }}00">
+            <div class="card h-100 bg-white bg-opacity-50 border-0 text-center p-3 rounded-4 shadow-sm">
                 {% if livre.image %}
-                    <img src="{{ livre.image.url }}" class="rounded-3 mb-3 shadow-sm" style="height: 120px; object-fit: cover;">
+                    <img src="{{ livre.image.url }}" class="rounded-3 mb-3 shadow-sm" style="height: 140px; object-fit: cover;">
                 {% endif %}
-                <h6 class="text-truncate">{{ livre.titre }}</h6>
-                <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-light rounded-pill mt-2">Détails</a>
+                <h6 class="text-truncate fw-bold">{{ livre.titre }}</h6>
+                <div class="stars">★★★★★</div>
+                <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Détails</a>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<!-- Search & Catalogue -->
-<div id="catalogue" class="d-flex justify-content-between align-items-center mb-5">
-    <h2 class="fw-bold">📚 Notre Collection</h2>
-    <form method="GET" style="width: 350px;">
-        <div class="input-group shadow-sm rounded-pill overflow-hidden">
-            <input name="q" class="form-control border-0 p-3" type="search" placeholder="Rechercher un livre..." value="{{ query|default:'' }}">
-            <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
-        </div>
-    </form>
+<!-- Search Bar -->
+<div id="catalogue" class="row mb-5 justify-content-between align-items-center">
+    <div class="col-md-5" data-aos="fade-right">
+        <h2 class="fw-bold m-0"><i class="fas fa-layer-group text-primary me-2"></i> Catalogue Complet</h2>
+    </div>
+    <div class="col-md-5" data-aos="fade-left">
+        <form method="GET" class="search-pill d-flex">
+            <input name="q" class="form-control border-0 rounded-pill px-4" type="search" placeholder="Titre, auteur, genre..." value="{{ query|default:'' }}">
+            <button class="btn btn-primary rounded-circle shadow" style="width: 45px; height: 45px;" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
 </div>
 
-<div class="row">
-    {% for livre in livres %}
-    <div class="col-md-4 mb-5">
-        <div class="card book-card h-100">
-            {% if livre.image %}
-                <img src="{{ livre.image.url }}" class="book-img" alt="{{ livre.titre }}">
-            {% else %}
-                <div class="book-img bg-secondary d-flex align-items-center justify-content-center text-white">Pas d'image</div>
-            {% endif %}
-            <div class="card-body p-4 text-center">
-                <span class="badge bg-primary-subtle text-primary rounded-pill mb-2 px-3">{{ livre.categorie }}</span>
-                <h4 class="fw-bold mb-2">{{ livre.titre }}</h4>
-                <p class="text-muted mb-4 small">Par {{ livre.auteur }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold {% if livre.est_disponible %}text-success{% else %}text-danger{% endif %}">
-                        {% if livre.est_disponible %}● En Stock{% else %}● Réservé{% endif %}
-                    </span>
-                    <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details px-4 shadow-sm">Détails</a>
+<!-- منطق البحث البديل (فكرة الـ Prof) -->
+{% if is_not_found %}
+    <div class="alert alert-warning border-0 rounded-4 p-4 shadow-sm mb-5" data-aos="shake">
+        <h4 class="fw-bold text-dark"><i class="fas fa-search-minus me-2"></i> Aucun résultat exact pour "{{ query }}"</h4>
+        <p class="mb-0">Mais ne partez pas ! Notre <strong>Intelligence Artificielle</strong> a trouvé ces titres similaires qui pourraient vous plaire :</p>
+    </div>
+    <div class="row">
+        {% for livre in alternative_results %}
+            <div class="col-md-4 mb-5" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <div class="card book-card h-100">
+                    <div class="position-relative">
+                        <span class="badge bg-info rounded-pill position-absolute top-0 start-0 m-3 shadow">Suggéré par l'IA</span>
+                        {% if livre.image %}<img src="{{ livre.image.url }}" class="book-img w-100">{% endif %}
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <h4 class="fw-bold mb-2">{{ livre.titre }}</h4>
+                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details shadow-sm">Explorer</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <!-- Catalogue العادي مع حركات AOS متدرجة -->
+    <div class="row">
+        {% for livre in livres %}
+        <div class="col-md-4 mb-5" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+            <div class="card book-card h-100">
+                <div class="position-relative">
+                    <span class="badge bg-primary rounded-pill position-absolute top-0 start-0 m-3 shadow">{{ livre.categorie }}</span>
+                    {% if livre.image %}
+                        <img src="{{ livre.image.url }}" class="book-img w-100" alt="{{ livre.titre }}">
+                    {% else %}
+                        <div class="book-img bg-light d-flex align-items-center justify-content-center">📖 No Image</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4 text-center">
+                    <div class="stars">★★★★☆</div>
+                    <h4 class="fw-bold mb-1">{{ livre.titre }}</h4>
+                    <p class="text-muted small mb-4">Par <strong>{{ livre.auteur }}</strong></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i> Stock</span>
+                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details shadow-sm">Explorer</a>
+                    </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
+{% endif %}
+
 {% endblock %}

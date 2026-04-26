@@ -1,38 +1,128 @@
 {% extends "gestion_biblio/base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row bg-white p-4 rounded-4 shadow-sm">
-        <!-- تصويرة الكتاب -->
-        <div class="col-md-4 text-center">
-            {% if livre.image %}
-                <img src="{{ livre.image.url }}" class="img-fluid rounded-3 shadow" style="max-height: 400px;">
-            {% else %}
-                <div class="bg-light p-5 rounded">📖 Pas d'image</div>
-            {% endif %}
-        </div>
+<style>
+    .detail-card { border-radius: 30px; border: none; overflow: hidden; background: white; }
+    .book-cover-large { border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); transition: 0.4s; width: 100%; max-height: 450px; object-fit: cover; }
+    .book-cover-large:hover { transform: scale(1.02); }
+    .info-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 600; }
+    
+    /* ستايل النجوم (Play Store Style) */
+    .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 5px; }
+    .star-rating input { display: none; }
+    .star-rating label { font-size: 32px; color: #cbd5e1; cursor: pointer; transition: 0.2s; }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label { color: #f59e0b; } /* اللون الذهبي */
 
-        <!-- معلومات الكتاب -->
-        <div class="col-md-8">
-            <h1 class="fw-bold text-primary">{{ livre.titre }}</h1>
-            <h5 class="text-muted mb-4">Par : <strong>{{ livre.auteur }}</strong></h5>
-            
-            <span class="badge bg-info text-dark px-3 py-2 mb-4">{{ livre.categorie }}</span>
-            <p><strong>ISBN :</strong> {{ livre.isbn }}</p>
+    .rating-box { background: #f8fafc; border-radius: 25px; border: 1px solid #e2e8f0; padding: 25px; }
+    .btn-reserve { background: linear-gradient(45deg, #10b981, #059669); border: none; font-weight: 600; transition: 0.3s; }
+    .btn-reserve:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+    .sim-card { transition: 0.3s; border-radius: 20px; }
+    .sim-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+</style>
 
-            <hr>
-            <!-- هادي هي الـ Description -->
-            <h4 class="fw-bold mt-4">Résumé du livre</h4>
-            <p class="lead text-secondary" style="line-height: 1.8;">
-                {{ livre.description|default:"Désolé, aucun résumé n'est encore disponible pour cet ouvrage." }}
-            </p>
+<div class="container mt-5 mb-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4" data-aos="fade-down">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item active">{{ livre.titre }}</li>
+        </ol>
+    </nav>
 
-            <div class="mt-5">
-                <a href="{% url 'reserver_livre' livre.id %}" class="btn btn-success btn-lg px-5 rounded-pill shadow">
-                    <i class="fas fa-bookmark me-2"></i> Réserver maintenant
-                </a>
-                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg ms-2 rounded-pill">Retour</a>
+    <div class="card detail-card shadow-lg p-4 p-md-5">
+        <div class="row g-5">
+            <!-- الجهة اليسرى: الغلاف -->
+            <div class="col-md-4 text-center" data-aos="fade-right">
+                {% if livre.image %}
+                    <img src="{{ livre.image.url }}" class="img-fluid book-cover-large mb-4" alt="{{ livre.titre }}">
+                {% else %}
+                    <div class="bg-light p-5 rounded-4 mb-4 border"><i class="fas fa-book fa-5x text-muted"></i></div>
+                {% endif %}
+                
+                <div class="mt-2">
+                    <span class="text-warning fs-4"><i class="fas fa-star"></i> {{ moyenne|default:"5.0" }}/5</span>
+                    <p class="small text-muted">Basé sur {{ livre.notes.count }} avis lecteurs</p>
+                </div>
             </div>
+
+            <!-- الجهة اليمنى: المعلومات -->
+            <div class="col-md-8" data-aos="fade-left">
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3">{{ livre.categorie }}</span>
+                <h1 class="display-4 fw-bold mb-2">{{ livre.titre }}</h1>
+                <p class="fs-4 text-secondary mb-4">Par <strong>{{ livre.auteur }}</strong></p>
+
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <p class="info-label mb-1">Code ISBN</p>
+                        <p class="fw-bold">{{ livre.isbn }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="info-label mb-1">Statut</p>
+                        <p class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> En Stock</p>
+                    </div>
+                </div>
+
+                <hr class="opacity-10 mb-4">
+
+                <h4 class="fw-bold mb-3"><i class="fas fa-align-left text-primary me-2"></i> Résumé</h4>
+                <p class="lead text-muted" style="line-height: 1.8; text-align: justify;">
+                    {{ livre.description|default:"Aucune description disponible." }}
+                </p>
+
+                <!-- نظام التقييم بالنجوم المطور (Play Store Style) -->
+                <div class="rating-box mt-5 shadow-sm" data-aos="zoom-in">
+                    <h5 class="fw-bold mb-3">Évaluez ce livre ⭐</h5>
+                    <form action="{% url 'ajouter_note' livre.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="star-rating mb-3">
+                            <input type="radio" id="star5" name="valeur" value="5" required /><label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="valeur" value="4" /><label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="valeur" value="3" /><label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="valeur" value="2" /><label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="valeur" value="1" /><label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">Envoyer ma note</button>
+                    </form>
+                </div>
+
+                <!-- بوطونات التحكم -->
+                <div class="mt-5 d-flex gap-3">
+    {% if disponible %}
+        <!-- إلا كان واجد: رزرفي نيشان -->
+        <a href="{% url 'reserver_livre' livre.id %}" class="btn btn-reserve btn-lg px-5 rounded-pill text-white shadow-lg">
+            <i class="fas fa-bookmark me-2"></i> Réserver le livre
+        </a>
+    {% else %}
+        <!-- إلا كان مسلف: تسجل فـ قائمة الانتظار (Smart Alerte) -->
+        <a href="{% url 'rejoindre_attente' livre.id %}" class="btn btn-warning btn-lg px-5 rounded-pill shadow-lg fw-bold">
+            <i class="fas fa-bell me-2"></i> M'avertir quand il sera libre
+        </a>
+        <p class="text-danger small mt-2 fw-bold"><i class="fas fa-info-circle"></i> Ce livre est actuellement victime de son succès !</p>
+    {% endif %}
+    
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">Retour</a>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- كتوبة مشابهة -->
+    <div class="mt-5 pt-5" data-aos="fade-up">
+        <h3 class="fw-bold mb-4"><i class="fas fa-layer-group text-primary me-2"></i> Dans la même catégorie</h3>
+        <div class="row">
+            {% for s in similaires %}
+            <div class="col-md-4 mb-4">
+                <div class="card sim-card border-0 shadow-sm overflow-hidden h-100">
+                    {% if s.image %}<img src="{{ s.image.url }}" style="height: 180px; object-fit: cover;">{% endif %}
+                    <div class="card-body text-center p-3">
+                        <h6 class="fw-bold text-truncate">{{ s.titre }}</h6>
+                        <a href="{% url 'detail_livre' s.id %}" class="btn btn-sm btn-outline-primary rounded-pill mt-2">Découvrir</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
