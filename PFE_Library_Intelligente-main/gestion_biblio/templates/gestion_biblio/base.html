@@ -2,95 +2,277 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart-Biblio | FSBM AI</title>
+    <title>Smart-Biblio | FSBM AI Premium</title>
+    
     <!-- CSS: Bootstrap, FontAwesome & AOS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        :root { --primary: #4f46e5; --secondary: #0f172a; --accent: #f59e0b; }
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-        .navbar { background: rgba(15, 23, 42, 0.95) !important; backdrop-filter: blur(10px); border-bottom: 3px solid var(--primary); }
-        .nav-link { font-weight: 500; transition: 0.3s; color: rgba(255,255,255,0.8) !important; }
-        .nav-link:hover { color: var(--accent) !important; transform: translateY(-2px); }
-        .btn-stats { background: linear-gradient(45deg, #f59e0b, #d97706); color: white !important; border-radius: 25px; padding: 8px 20px !important; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
-        #chat-bubble { position:fixed; bottom:25px; right:25px; width:65px; height:65px; background: linear-gradient(135deg, var(--primary), #818cf8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor:pointer; z-index:1000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid white; animation: float 3s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        #chat-window { display:none; position:fixed; bottom:100px; right:25px; width:350px; background:white; border-radius:20px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index:1000; overflow:hidden; border: 1px solid #ddd; }
+        :root { 
+            --primary: #4f46e5; 
+            --nav-bg: #0f172a; 
+            --text-light: rgba(255, 255, 255, 0.85);
+            --bg-body: #f8fafc;
+        }
+
+        /* --- Mode Sombre أ الزين --- */
+        body.dark-mode { 
+            --bg-body: #020617;
+            color: #f8fafc;
+        }
+        body.dark-mode .glass-card, body.dark-mode .ai-banner, body.dark-mode .card { 
+            background: rgba(30, 41, 59, 0.7) !important; 
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white !important;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); transition: 0.3s; overflow-x: hidden; }
+
+        /* --- الخلفية لي كتحرك (Animated Blobs) --- */
+        .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: var(--bg-body); }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: move 20s infinite alternate ease-in-out; }
+        .blob-1 { width: 500px; height: 500px; background: #dbeafe; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #fae8ff; bottom: -50px; right: -50px; animation-delay: -5s; }
+        @keyframes move { from { transform: translate(0, 0); } to { transform: translate(60px, 80px); } }
+
+        /* --- Navbar (Style Netflix) --- */
+        .navbar { background-color: var(--nav-bg) !important; padding: 15px 0; border-bottom: 2px solid var(--primary); }
+        .navbar-brand { font-weight: 800; font-size: 1.6rem; color: white !important; letter-spacing: -1px; }
+        .nav-link { color: var(--text-light) !important; font-weight: 600; margin: 0 10px; transition: 0.3s; }
+        .nav-link:hover { color: white !important; transform: translateY(-2px); }
+
+        /* بوطون اللغة (Netflix Style) */
+        .lang-dropdown { position: relative; display: inline-block; }
+        .lang-btn {
+            background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 15px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .lang-menu {
+            display: none; position: absolute; top: 110%; right: 0; background: white;
+            min-width: 130px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2000;
+        }
+        .lang-item { padding: 10px 15px; color: #1e293b; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .lang-item:hover { background: #f1f5f9; color: var(--primary); }
+
+        /* خبيو وودجيت جوجل الأصلي */
+        #google_translate_element { display: none !important; }
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
+
+        .theme-toggle { cursor: pointer; color: white; font-size: 1.2rem; margin-left: 15px; transition: 0.3s; }
+        footer { background: white; padding: 50px 0; border-top: 1px solid #f1f5f9; }
+
+        /* --- قهر شريط جوجل بمرة أ وصال --- */
+iframe.goog-te-banner-frame {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+    position: static !important;
+}
+
+.skiptranslate {
+    display: none !important;
+}
+
+/* هادا السطر ضروري باش ما تبقاش بلاصتو خاوية لفوق */
+html {
+    margin-top: 0px !important;
+}
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+}
+.card:hover {
+    transform: translateY(-10px); /* الكتاب كيطلع شوية */
+    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.2); /* ضل ملون زوين */
+}
+/* ستايل ديال السكرول بار */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #4338ca;
+}
     </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- --- Chatbot UI Button --- -->
+<div id="chatbot-launcher" onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999;">
+    <i class="fas fa-comments fa-lg"></i>
+</div>
+
+<!-- --- Chatbot Window --- -->
+<div id="chat-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; z-index: 9999;">
+    <div style="background: var(--nav-bg); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+        <span><i class="fas fa-robot me-2"></i> Smart-Biblio AI</span>
+        <i class="fas fa-times cursor-pointer" onclick="toggleChat()" style="cursor: pointer;"></i>
+    </div>
+    <div id="chat-content" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; color: #1e293b;">
+        <p style="background: #e2e8f0; padding: 10px; border-radius: 10px; font-size: 0.9rem;">Bonjour ! Comment puis-je vous aider aujourd'hui ?</p>
+    </div>
+    <div style="padding: 10px; border-top: 1px solid #eee; display: flex; gap: 5px;">
+        <input id="chat-input" type="text" class="form-control" placeholder="Posez votre question..." style="border-radius: 20px;">
+        <button onclick="sendMessage()" class="btn btn-primary" style="border-radius: 50%;"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        const chat = document.getElementById('chat-window');
+        chat.style.display = chat.style.display === 'none' || chat.style.display === '' ? 'flex' : 'none';
+    }
+
+    function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const content = document.getElementById('chat-content');
+    const message = input.value.trim();
+
+    if (message !== "") {
+        // 1. عرض رسالة المستخدم
+        content.innerHTML += `<div style="text-align: right; margin-bottom: 10px;">
+            <span style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; font-size: 0.9rem;">${message}</span>
+        </div>`;
+        
+        input.value = "";
+        content.scrollTop = content.scrollHeight;
+
+        // 2. صيفط الميساج لـ Django
+        fetch('/chatbot-api/', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}' // ضروري باش Django يقبل الطلب
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 3. عرض جواب الـ IA الحقيقي
+            content.innerHTML += `<div style="text-align: left; margin-bottom: 10px;">
+                <span style="background: #e2e8f0; color: #1e293b; padding: 8px 12px; border-radius: 15px; display: inline-block; font-size: 0.9rem;">${data.reply}</span>
+            </div>`;
+            content.scrollTop = content.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            content.innerHTML += `<p style="color:red; font-size:0.8rem;">Erreur de connexion au serveur.</p>`;
+        });
+    }
+}
+</script>
 <body>
+
+    <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-lg">
+    <nav class="navbar navbar-expand-lg sticky-top shadow-lg">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">📚 Smart-Biblio <span class="badge bg-info fs-6">FSBM</span></a>
+            <a class="navbar-brand" href="{% url 'home' %}">Smart<span style="color:var(--primary)">Biblio</span></a>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center">
-                    <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a>
+                    
+                    <!-- Language Selector (Netflix Style) -->
+                    <div class="lang-dropdown me-3">
+                        <div class="lang-btn" onclick="toggleLangMenu()">
+                            <i class="fas fa-globe small"></i> <span id="current-lang">Français</span> <i class="fas fa-caret-down small"></i>
+                        </div>
+                        <div class="lang-menu" id="langMenu">
+                            <div class="lang-item" onclick="changeLanguage('ar', 'العربية')">العربية</div>
+                            <div class="lang-item" onclick="changeLanguage('fr', 'Français')">Français</div>
+                            <div class="lang-item" onclick="changeLanguage('en', 'English')">English</div>
+                        </div>
+                    </div>
+
+                    <a class="nav-link" href="{% url 'home' %}">Accueil</a>
 
                     {% if not user.is_authenticated %}
-                        <a class="nav-link text-info fw-bold mx-2" href="{% url 'register' %}"><i class="fas fa-user-plus"></i> S'inscrire</a>
-                        <a class="btn btn-outline-warning btn-sm px-4 rounded-pill ms-lg-2" href="/admin/"><i class="fas fa-user-shield"></i> Accès Admin</a>
+                       <a class="nav-link px-3" href="{% url 'login' %}">
+                     <i class="fas fa-sign-in-alt me-1"></i> Connexion
+                      </a>
+                        <a class="nav-link" href="/admin/">Accès Admin</a>
                     {% else %}
-                        <!-- هادا دابا كيبان لكلشي (طالب ومدير) -->
-                        <a class="nav-link btn-stats mx-2" href="{% url 'dashboard' %}">📊 Dashboard IA</a>
-
-                        {% if user.is_superuser %}
-                            <a class="nav-link text-warning fw-bold" href="/admin/"><i class="fas fa-tools"></i> Admin Panel</a>
-                        {% else %}
-                            <a class="nav-link fw-bold" href="{% url 'mon_espace' %}"><i class="fas fa-user-graduate"></i> Mon Espace</a>
-                        {% endif %}
-                        
-                        <a class="nav-link text-danger fw-bold ms-lg-3" href="{% url 'logout' %}"><i class="fas fa-power-off"></i> Quitter</a>
+                        <a class="nav-link" href="{% url 'mon_espace' %}">Mon Espace</a>
+                        <a class="nav-link text-primary fw-bold" href="{% url 'dashboard' %}">📊 Dashboard</a>
+                        <a class="nav-link text-danger" href="{% url 'logout' %}"><i class="fas fa-power-off"></i></a>
                     {% endif %}
+
+                    <div class="theme-toggle" onclick="toggleDarkMode()" id="themeIcon"><i class="fas fa-moon"></i></div>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="container py-5 min-vh-100">
-        {% if messages %}{% for m in messages %}<div class="alert alert-info rounded-4">{{ m }}</div>{% endfor %}{% endif %}
+        {% if messages %}{% for m in messages %}<div class="alert alert-primary shadow-sm rounded-4">{{ m }}</div>{% endfor %}{% endif %}
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="text-center py-5 bg-white border-top mt-5 shadow-sm">
-        <div class="container">
-            <p class="mb-0 fw-bold">Réalisé par : <span class="text-primary">Wissal & Ilham</span> | PFE FSBM 2026</p>
-        </div>
-    </footer>
-
-    <!-- CHATBOT -->
-    <div id="chat-bubble" onclick="toggleChat()"><i class="fas fa-robot fa-lg text-white"></i></div>
-    <div id="chat-window" class="shadow-lg">
-        <div style="background:var(--secondary); color:white; padding:15px; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
-            <span>🤖 Assistant Intelligent</span> <span onclick="toggleChat()" style="cursor:pointer;">&times;</span>
-        </div>
-        <div id="chat-content" style="height:300px; overflow-y:auto; padding:20px; background:#f9fafb; display:flex; flex-direction:column; gap:10px;">
-            <div style="background:#eee; padding:10px; border-radius:15px 15px 15px 0; align-self:flex-start; font-size:14px;">Bonjour ! Comment puis-je vous aider ?</div>
-        </div>
-        <div class="p-3 bg-white border-top d-flex">
-            <input type="text" id="chat-input" class="form-control border-0 bg-light rounded-pill px-3" placeholder="Écrivez ici...">
-            <button onclick="sendMessage()" class="btn btn-primary rounded-circle ms-2" style="width: 40px; height: 40px;"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
+    <!-- العنصر المخفي لي غادي يخدم الترجمة -->
+    <div id="google_translate_element"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script>
-        AOS.init();
-        function toggleChat() { const c = document.getElementById('chat-window'); c.style.display = c.style.display === 'none' ? 'block' : 'none'; }
-        function sendMessage() {
-            const i = document.getElementById('chat-input'), c = document.getElementById('chat-content');
-            if(!i.value.trim()) return;
-            c.innerHTML += `<div class="p-2 bg-primary text-white rounded-4 mb-2 align-self-end" style="max-width:80%; font-size:14px;">${i.value}</div>`;
-            const msg = i.value; i.value = "";
-            fetch(`/chatbot/?message=${encodeURIComponent(msg)}`).then(r=>r.json()).then(d=>{
-                c.innerHTML += `<div style="background:#eee; padding:10px; border-radius:15px 15px 15px 0; align-self:flex-start; font-size:14px; max-width:80%;" class="mb-2">${d.response}</div>`;
-                c.scrollTop = c.scrollHeight;
-            });
+    
+    <script type="text/javascript">
+        // 1. ترجمة جوجل
+        function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'fr',
+        includedLanguages: 'ar,en,fr',
+        autoDisplay: false
+    }, 'google_translate_element');
+
+    // --- الحيلة الذكية: مسح الشريط بمجرد ما يتولد ---
+    var interval = setInterval(function() {
+        var googleFrame = document.querySelector('.goog-te-banner-frame');
+        if (googleFrame) {
+            googleFrame.style.display = 'none';
+            document.body.style.top = '0px';
+            document.documentElement.style.marginTop = '0px';
+            clearInterval(interval);
         }
+    }, 100); // كيبقى يقلب كل 100 ميلي ثانية حتى يلقاه ويطفيييه
+}
+        function changeLanguage(langCode, langName) {
+            const selectEl = document.querySelector('.goog-te-combo');
+            if (selectEl) {
+                selectEl.value = langCode;
+                selectEl.dispatchEvent(new Event('change'));
+                document.getElementById('current-lang').innerText = langName;
+                toggleLangMenu();
+            }
+        }
+        function toggleLangMenu() {
+            const menu = document.getElementById('langMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // 2. المود سومبر
+        function toggleDarkMode() {
+            const body = document.body, icon = document.querySelector('#themeIcon i');
+            body.classList.toggle('dark-mode');
+            if(body.classList.contains('dark-mode')) { icon.classList.replace('fa-moon', 'fa-sun'); localStorage.setItem('theme', 'dark'); }
+            else { icon.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); }
+        }
+        if(localStorage.getItem('theme') === 'dark') toggleDarkMode();
+        AOS.init({ duration: 800, once: true });
     </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

@@ -1,59 +1,81 @@
 {% extends "gestion_biblio/base.html" %}
 
 {% block content %}
-<div class="row justify-content-center mt-5" data-aos="zoom-in">
-    <div class="col-md-5">
-        <div class="card shadow-lg border-0 rounded-4 p-5">
-            <h2 class="fw-bold text-center text-primary mb-4">Connexion Étudiant 👤</h2>
-            
-            <!-- --- اللعبة الجديدة: إظهار رسالة الخطأ --- -->
+<style>
+    .auth-card {
+        border-radius: 40px; border: none; background: white;
+        box-shadow: 0 40px 100px -20px rgba(0,0,0,0.08);
+        overflow: hidden; max-width: 450px; margin: 40px auto;
+    }
+    .auth-header { padding: 50px 40px 20px; text-align: center; }
+    .auth-body { padding: 20px 50px 50px; }
+    
+    .brand-icon {
+        width: 70px; height: 70px; background: #4f46e5;
+        color: white; border-radius: 22px; display: inline-flex;
+        align-items: center; justify-content: center; margin-bottom: 25px;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    .form-control-premium {
+        background: #f8fafc !important; border: 1.5px solid #f1f5f9 !important;
+        border-radius: 18px !important; padding: 15px 20px !important;
+        font-weight: 500; transition: 0.3s;
+    }
+
+    /* --- هادا هو البوطون لي صلحنا أ وصال --- */
+    .btn-login-premium {
+        background: #4f46e5 !important; /* لون أزرق ملكي وااااضح */
+        color: white !important; /* كتابة بيضا */
+        border: none;
+        border-radius: 18px;
+        padding: 16px;
+        font-weight: 700;
+        width: 100%;
+        transition: 0.4s;
+        margin-top: 20px;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        cursor: pointer;
+    }
+
+    .btn-login-premium:hover {
+        background: #4338ca !important; /* كيولي أزرق مغلوق شوية عند التمرير */
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+    }
+</style>
+
+<div class="container" data-aos="zoom-in">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <div class="brand-icon"><i class="fas fa-fingerprint fa-2x"></i></div>
+            <h2 class="fw-bold text-dark">Connexion</h2>
+            <p class="text-muted small">Accédez à votre bibliothèque intelligente</p>
+        </div>
+
+        <div class="auth-body">
             {% if form.errors %}
-                <div class="alert alert-danger rounded-4 shadow-sm border-0 mb-4 animate__animated animate__shakeX" role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <span class="small">Identifiants incorrects. Veuillez vérifier votre nom d'utilisateur ou mot de passe.</span>
-                    </div>
-                </div>
+                <div class="alert alert-danger border-0 rounded-4 small py-2 text-center">Identifiants incorrects.</div>
             {% endif %}
 
             <form method="POST">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-secondary">Nom d'utilisateur</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-0"><i class="fas fa-user text-muted"></i></span>
-                        <input type="text" name="username" class="form-control bg-light border-0 p-3" placeholder="Ex: atif" required>
-                    </div>
-                </div>
-                
                 <div class="mb-4">
-                    <label class="form-label fw-bold small text-secondary">Mot de passe</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-0"><i class="fas fa-lock text-muted"></i></span>
-                        <input type="password" name="password" class="form-control bg-light border-0 p-3" placeholder="••••••••" required>
-                    </div>
+                    <label class="form-label small fw-bold text-secondary">Nom d'utilisateur</label>
+                    <input type="text" name="username" class="form-control-premium" placeholder="Ex: atif" required>
                 </div>
-
-                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-lg">
-                    Se connecter <i class="fas fa-arrow-right ms-2"></i>
-                </button>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Mot de passe</label>
+                    <input type="password" name="password" class="form-control-premium" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-login-premium shadow">Se connecter <i class="fas fa-arrow-right ms-2"></i></button>
             </form>
-            
-            <p class="text-center mt-4 small text-muted">
-                Pas encore de compte ? <a href="{% url 'register' %}" class="fw-bold text-decoration-none text-primary">Créer un profil</a>
-            </p>
+
+            <div class="text-center mt-5">
+                <p class="small text-muted mb-0">Pas encore de compte ?</p>
+                <a href="{% url 'register' %}" class="text-primary fw-bold text-decoration-none">Créer un profil étudiant</a>
+            </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* تحسين شكل الخانات */
-    .form-control:focus {
-        background-color: #fff !important;
-        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1);
-        border: 1px solid var(--primary) !important;
-    }
-    .input-group-text { border-radius: 15px 0 0 15px !important; }
-    .form-control { border-radius: 0 15px 15px 0 !important; }
-</style>
 {% endblock %}

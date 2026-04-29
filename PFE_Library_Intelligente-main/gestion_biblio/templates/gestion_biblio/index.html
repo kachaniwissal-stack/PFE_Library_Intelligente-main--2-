@@ -2,132 +2,103 @@
 
 {% block content %}
 <style>
-    /* Hero Section Premium */
-    .hero-premium {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        border-radius: 40px;
+    /* --- هاد الكود هو لي كيدير الخلفية لي كتحرك أ الزين --- */
+    .hero-animated {
+        position: relative;
+        background: #0f172a; 
+        border-radius: 45px;
         padding: 100px 20px;
         margin-bottom: 60px;
-        position: relative;
         overflow: hidden;
-        border: 1px solid rgba(255,255,255,0.1);
         color: white;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
-    .hero-premium h1 { font-size: 3.5rem; font-weight: 800; background: linear-gradient(to right, #fff, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    /* Glassmorphism for AI Box */
-    .ai-glass {
-        background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 30px;
-        padding: 40px;
-        margin-bottom: 60px;
-    }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 1; opacity: 0.4; animation: move 10s infinite alternate ease-in-out; }
+    .orb-1 { width: 400px; height: 400px; background: #4f46e5; top: -100px; left: -100px; }
+    .orb-2 { width: 350px; height: 350px; background: #7c3aed; bottom: -50px; right: -50px; }
+    @keyframes move { from { transform: translate(0, 0); } to { transform: translate(40px, 60px); } }
+    .hero-content { position: relative; z-index: 2; }
+    .hero-animated h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -2px; }
+    .hero-animated h1 span { background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    /* Modern Book Cards */
-    .book-card { border: none; border-radius: 25px; overflow: hidden; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-    .book-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-    .book-img { height: 320px; object-fit: cover; transition: 0.5s; }
-    .book-card:hover .book-img { transform: scale(1.05); }
-    
-    .stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 10px; }
-    .btn-details { background: #0f172a; color: white; border-radius: 15px; padding: 10px 25px; transition: 0.3s; font-weight: 600; }
-    .btn-details:hover { background: #4f46e5; color: white; transform: scale(1.05); }
+    .search-glass { background: white; border-radius: 30px; padding: 12px; max-width: 650px; margin: -60px auto 60px; position: relative; z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #eee; }
 
-    .search-pill { background: white; border-radius: 50px; padding: 5px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    .book-card { border: none; border-radius: 28px; background: white; transition: 0.5s; overflow: hidden; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+    .book-card:hover { transform: translateY(-15px); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
 </style>
 
-<!-- Hero Section (data-aos: حركة للصعود) -->
-<div class="hero-premium text-center shadow-lg" data-aos="zoom-out-up">
-    <div class="container py-4">
-        <h1 class="mb-3">L'Intelligence au Service du Savoir 📚</h1>
-        <p class="fs-4 opacity-75 mb-5 mx-auto" style="max-width: 700px;">Explorez une vaste collection d'ouvrages assistée par nos algorithmes de recommandation avancés.</p>
-        <a href="#catalogue" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-lg py-3">Explorer la Collection</a>
-    </div>
-</div>
-
-<!-- Recommandations IA (data-aos: حركة من اليمين) -->
-<div class="ai-glass shadow-sm" data-aos="fade-right">
-    <h3 class="fw-bold mb-4 text-primary"><i class="fas fa-sparkles text-warning me-2"></i> Choisi par notre IA pour vous</h3>
-    <div class="row">
-        {% for livre in recommandations %}
-        <div class="col-md-3 mb-3" data-aos="flip-left" data-aos-delay="{{ forloop.counter }}00">
-            <div class="card h-100 bg-white bg-opacity-50 border-0 text-center p-3 rounded-4 shadow-sm">
-                {% if livre.image %}
-                    <img src="{{ livre.image.url }}" class="rounded-3 mb-3 shadow-sm" style="height: 140px; object-fit: cover;">
-                {% endif %}
-                <h6 class="text-truncate fw-bold">{{ livre.titre }}</h6>
-                <div class="stars">★★★★★</div>
-                <a href="{% url 'detail_livre' livre.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Détails</a>
-            </div>
-        </div>
-        {% endfor %}
+<!-- Hero Section -->
+<div class="hero-animated" data-aos="zoom-out">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="hero-content text-center" data-aos="fade-up">
+        <h1>Bienvenue dans <span>votre Bibliothèque</span> Intelligente.</h1>
+        <p class="lead fs-5 opacity-75">Accédez instantanément aux ressources essentielles de la FSBM grâce à notre moteur de recherche intelligent.</p>
     </div>
 </div>
 
 <!-- Search Bar -->
-<div id="catalogue" class="row mb-5 justify-content-between align-items-center">
-    <div class="col-md-5" data-aos="fade-right">
-        <h2 class="fw-bold m-0"><i class="fas fa-layer-group text-primary me-2"></i> Catalogue Complet</h2>
-    </div>
-    <div class="col-md-5" data-aos="fade-left">
-        <form method="GET" class="search-pill d-flex">
-            <input name="q" class="form-control border-0 rounded-pill px-4" type="search" placeholder="Titre, auteur, genre..." value="{{ query|default:'' }}">
-            <button class="btn btn-primary rounded-circle shadow" style="width: 45px; height: 45px;" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-    </div>
+<div class="search-glass" data-aos="fade-up" data-aos-delay="200">
+    <form method="GET" class="d-flex align-items-center">
+        <i class="fas fa-search text-muted ms-3 fs-5"></i>
+        <input name="q" class="form-control border-0 bg-transparent fs-5 px-4" type="search" placeholder="Quel livre cherchez-vous ?" value="{{ query|default:'' }}">
+        <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold" type="submit">Trouver</button>
+    </form>
 </div>
 
-<!-- منطق البحث البديل (فكرة الـ Prof) -->
-{% if is_not_found %}
-    <div class="alert alert-warning border-0 rounded-4 p-4 shadow-sm mb-5" data-aos="shake">
-        <h4 class="fw-bold text-dark"><i class="fas fa-search-minus me-2"></i> Aucun résultat exact pour "{{ query }}"</h4>
-        <p class="mb-0">Mais ne partez pas ! Notre <strong>Intelligence Artificielle</strong> a trouvé ces titres similaires qui pourraient vous plaire :</p>
-    </div>
+<!-- Suggestions IA -->
+<div class="bg-white rounded-5 p-4 mb-5 shadow-sm border" data-aos="fade-up">
+    <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-magic text-primary me-2"></i> Suggestions pour vous</h4>
     <div class="row">
-        {% for livre in alternative_results %}
-            <div class="col-md-4 mb-5" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
-                <div class="card book-card h-100">
-                    <div class="position-relative">
-                        <span class="badge bg-info rounded-pill position-absolute top-0 start-0 m-3 shadow">Suggéré par l'IA</span>
-                        {% if livre.image %}<img src="{{ livre.image.url }}" class="book-img w-100">{% endif %}
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <h4 class="fw-bold mb-2">{{ livre.titre }}</h4>
-                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details shadow-sm">Explorer</a>
-                    </div>
+        {% for livre in recommandations %}
+        <div class="col-md-3 mb-3" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
+            <a href="{% url 'detail_livre' livre.id %}" class="text-decoration-none">
+                <div class="bg-light p-3 rounded-4 h-100 text-center border transition-all hover-bg-white shadow-sm">
+                    {% if livre.image %}<img src="{{ livre.image.url }}" class="rounded-3 shadow-sm mb-3" style="height: 110px; width: 80px; object-fit: cover;">{% endif %}
+                    <h6 class="text-dark text-truncate fw-bold mb-1">{{ livre.titre }}</h6>
+                    <!-- تبديل الكلمات للـ IA -->
+                    <small class="{% if livre.disponible %}text-success{% else %}text-danger{% endif %} fw-bold">
+                        {% if livre.disponible %}● Disponible{% else %}● Déjà réservé{% endif %}
+                    </small>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <!-- Catalogue العادي مع حركات AOS متدرجة -->
-    <div class="row">
-        {% for livre in livres %}
-        <div class="col-md-4 mb-5" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
-            <div class="card book-card h-100">
-                <div class="position-relative">
-                    <span class="badge bg-primary rounded-pill position-absolute top-0 start-0 m-3 shadow">{{ livre.categorie }}</span>
-                    {% if livre.image %}
-                        <img src="{{ livre.image.url }}" class="book-img w-100" alt="{{ livre.titre }}">
-                    {% else %}
-                        <div class="book-img bg-light d-flex align-items-center justify-content-center">📖 No Image</div>
-                    {% endif %}
-                </div>
-                <div class="card-body p-4 text-center">
-                    <div class="stars">★★★★☆</div>
-                    <h4 class="fw-bold mb-1">{{ livre.titre }}</h4>
-                    <p class="text-muted small mb-4">Par <strong>{{ livre.auteur }}</strong></p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-success"><i class="fas fa-check-circle me-1"></i> Stock</span>
-                        <a href="{% url 'detail_livre' livre.id %}" class="btn btn-details shadow-sm">Explorer</a>
-                    </div>
-                </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
     </div>
-{% endif %}
+</div>
 
+<!-- Main Collection -->
+<div class="row mt-5">
+    <div class="col-12 mb-5 d-flex justify-content-between align-items-end" data-aos="fade-up">
+        <h2 class="fw-bold display-6">📚 Notre Collection</h2>
+        <span class="badge bg-dark rounded-pill px-3 py-2">{{ livres.count }} Ouvrages</span>
+    </div>
+    
+    {% for livre in livres %}
+    <div class="col-md-4 mb-5" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+        <div class="card book-card">
+            <div class="position-relative overflow-hidden" style="height: 400px;">
+                {% if livre.image %}
+                    <img src="{{ livre.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ livre.titre }}">
+                {% endif %}
+                <!-- اللعبة الذكية: التوفر الحقيقي -->
+                <!-- قلبي على هاد السطر فـ index.html وبدليه بهادا -->
+            <span class="position-absolute top-0 start-0 m-3 badge {% if livre.disponible %}bg-success{% else %}bg-danger{% endif %} shadow py-2 px-3 rounded-pill fw-bold">
+    {% if livre.disponible %}
+        <i class="fas fa-check-circle me-1"></i> Disponible
+    {% else %}
+        <i class="fas fa-clock me-1"></i> Déjà réservé
+    {% endif %}
+             </span>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="text-warning small mb-2">★★★★★</div>
+                <h4 class="fw-bold mb-1 text-dark text-truncate">{{ livre.titre }}</h4>
+                <p class="text-muted small mb-4">Par <strong>{{ livre.auteur }}</strong></p>
+                <a href="{% url 'detail_livre' livre.id %}" class="btn btn-outline-primary rounded-pill w-100 py-2 fw-bold">Détails et Réservation</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

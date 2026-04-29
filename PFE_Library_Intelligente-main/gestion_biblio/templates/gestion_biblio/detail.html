@@ -20,6 +20,18 @@
     .btn-reserve:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
     .sim-card { transition: 0.3s; border-radius: 20px; }
     .sim-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+
+     /* تحسين حركة البوطون */
+    .btn-outline-dark {
+        border: 2px solid #0f172a !important;
+        color: #0f172a !important;
+    }
+    .btn-outline-dark:hover {
+        background-color: #0f172a !important;
+        color: white !important;
+        transform: translateX(-5px); /* كيهرب شوية لليصر كأنه سهم حقيقي */
+    }
 </style>
 
 <div class="container mt-5 mb-5">
@@ -99,10 +111,12 @@
         <a href="{% url 'rejoindre_attente' livre.id %}" class="btn btn-warning btn-lg px-5 rounded-pill shadow-lg fw-bold">
             <i class="fas fa-bell me-2"></i> M'avertir quand il sera libre
         </a>
-        <p class="text-danger small mt-2 fw-bold"><i class="fas fa-info-circle"></i> Ce livre est actuellement victime de son succès !</p>
+        <p class="text-danger small mt-2 fw-bold"><i class="fas fa-info-circle"></i> Toutes les copies sont actuellement réservées. Soyez informé dès son retour !</p>
     {% endif %}
     
-    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">Retour</a>
+    <a href="{% url 'home' %}" class="btn btn-outline-dark btn-lg px-5 rounded-pill shadow-sm transition-all fw-bold">
+    <i class="fas fa-arrow-left me-2"></i> Retour
+</a>
 </div>
             </div>
         </div>

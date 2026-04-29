@@ -11,13 +11,14 @@ ALLOWED_HOSTS = []
 
 # 3. التطبيقات المسجلة
 INSTALLED_APPS = [
+    'jazzmin',              # هادي هي اللولة ضروري أ وصال
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gestion_biblio',  
+    'gestion_biblio',       # التطبيق ديالك
 ]
 
 # 4. البرمجيات الوسيطة
@@ -91,3 +92,13 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Smart Biblio Admin",
+    "site_header": "Smart-Biblio",
+    "site_brand": "FSBM Library",
+    "welcome_sign": "Bienvenue dans l'espace de gestion Smart-Biblio",
+    "copyright": "Wissal & Ilham PFE",
+    "search_model": ["auth.User", "gestion_biblio.Livre"],
+    "show_ui_builder": True, # هادي واعرة: غاتخليك تبدلي الألوان نيشان من السيت!
+}

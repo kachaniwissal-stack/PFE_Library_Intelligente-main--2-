@@ -16,4 +16,5 @@ urlpatterns = [
     path('annuler/<int:emprunt_id>/', views.annuler_reservation, name='annuler_reservation'),
     path('rejoindre-attente/<int:livre_id>/', views.rejoindre_attente, name='rejoindre_attente'),
     path('rejoindre-attente/<int:livre_id>/', views.rejoindre_attente, name='rejoindre_attente'),
+    path('chatbot-api/', views.chatbot_response, name='chatbot_api'),
 ]
