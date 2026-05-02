@@ -1,44 +1,70 @@
 {% extends "gestion_biblio/base.html" %}
+{% load static %}
 
 {% block content %}
 <style>
-    .auth-card-reg {
-        border-radius: 40px; border: none; background: white;
-        box-shadow: 0 40px 100px -20px rgba(0,0,0,0.08);
-        overflow: hidden; max-width: 550px; margin: 20px auto;
+    .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 80vh; }
+    .glass-form-card {
+        background: rgba(255, 255, 255, 0.35) !important;
+        backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 40px; padding: 45px; width: 100%; max-width: 500px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1); text-align: center;
     }
-    .reg-header { background: #f8fafc; padding: 40px; text-align: center; border-bottom: 1px solid #eee; }
-    .reg-body { padding: 40px 50px; }
+    .auth-icon { width: 60px; height: 60px; background: #8d6e63; color: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.5rem; }
+    .glass-form-card h2 { color: #3e2723; font-weight: 800; }
+    
+    .form-group-custom { text-align: left; margin-bottom: 18px; }
+    .form-group-custom label { display: block; margin-left: 10px; margin-bottom: 5px; color: #3e2723; font-weight: 700; font-size: 0.85rem; }
+    
+    /* هاد الستايل غايتحكم فـ الخانات لي كيعطي Django */
+    .form-group-custom input, .form-group-custom select {
+        width: 100%; padding: 12px 18px; border-radius: 15px;
+        border: 1px solid rgba(141, 110, 99, 0.2); background: rgba(255, 255, 255, 0.8);
+        color: #3e2723; font-weight: 600; outline: none; transition: 0.3s;
+    }
+    .form-group-custom input:focus { border-color: #8d6e63; box-shadow: 0 0 10px rgba(141, 110, 99, 0.1); }
+
+    .btn-latte {
+        background: #3e2723; color: white; border: none; padding: 15px; border-radius: 15px;
+        width: 100%; font-weight: 800; margin-top: 10px; transition: 0.4s;
+    }
+    .btn-latte:hover { background: #5d4037; transform: translateY(-3px); }
+    
+    /* ستايل للأخطاء باش يبانو ليك */
+    .error-msg { color: #dc2626; font-size: 0.75rem; font-weight: 700; margin-top: 5px; list-style: none; padding: 0; }
 </style>
 
-<div class="container" data-aos="fade-up">
-    <div class="card auth-card-reg">
-        <div class="reg-header">
-            <h2 class="fw-bold text-dark mb-1">Inscription Étudiant</h2>
-            <p class="text-muted small mb-0">Remplissez vos informations pour commencer</p>
-        </div>
+<div class="auth-wrapper" data-aos="zoom-in">
+    <div class="glass-form-card">
+        <div class="auth-icon"><i class="fas fa-user-plus"></i></div>
+        <h2>Inscription</h2>
+        <p class="text-muted small">Remplissez vos infos pour créer votre compte</p>
 
-        <div class="reg-body">
-            <form method="POST">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-secondary">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}<small class="text-danger d-block mt-1">{{ error }}</small>{% endfor %}
-                    </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-login-premium shadow">S'inscrire et commencer <i class="fas fa-check-circle ms-2"></i></button>
-            </form>
+        <form method="POST" class="mt-4">
+            {% csrf_token %}
             
-            <div class="text-center mt-4">
-                <a href="{% url 'login' %}" class="text-muted small text-decoration-none">← Retour à la connexion</a>
+            {% for field in form %}
+            <div class="form-group-custom">
+                <label>{{ field.label }}</label>
+                {{ field }} <!-- هادي هي لي كتجيب الخانة الصحيحة من Django -->
+                
+                <!-- إلا كان شي غلط فـ هاد الخانة غايبان هنا بـ الأحمر -->
+                {% if field.errors %}
+                    <ul class="error-msg">
+                        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
             </div>
-        </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-latte">
+                S'inscrire et commencer <i class="fas fa-magic ms-2"></i>
+            </button>
+
+            <div class="mt-4 small fw-bold">
+                Déjà inscrit ? <a href="{% url 'login' %}" style="color:#8b4513; text-decoration:none;">Se connecter</a>
+            </div>
+        </form>
     </div>
 </div>
-
-<script>
-    document.querySelectorAll('input, select').forEach(el => el.classList.add('form-control-premium'));
-</script>
 {% endblock %}

@@ -1,79 +1,135 @@
 {% extends "gestion_biblio/base.html" %}
+{% load static %}
 
 {% block content %}
 <style>
-    .auth-card {
-        border-radius: 40px; border: none; background: white;
-        box-shadow: 0 40px 100px -20px rgba(0,0,0,0.08);
-        overflow: hidden; max-width: 450px; margin: 40px auto;
+    /* هاد الجزء كايخلي الصفحة كاملة تاخد الخلفية ديال المكتبة مع تأثير الضبابة */
+    body {
+        background: url("{% static 'images/votre_image_bg.jpg' %}") no-repeat center center fixed; /* تأكدي من مسار الصورة */
+        background-size: cover;
     }
-    .auth-header { padding: 50px 40px 20px; text-align: center; }
-    .auth-body { padding: 20px 50px 50px; }
+
+    .login-container {
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .auth-card {
+        border-radius: 40px; 
+        border: 1px solid rgba(255, 255, 255, 0.2); 
+        background: rgba(255, 255, 255, 0.12); /* شفافية */
+        backdrop-filter: blur(20px); /* تأثير الزجاج الضبابي */
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        overflow: hidden; 
+        max-width: 480px; 
+        width: 100%;
+        margin: 40px auto;
+        color: white;
+    }
+
+    .auth-header { padding: 40px 40px 10px; text-align: center; }
+    .auth-body { padding: 10px 50px 40px; }
     
     .brand-icon {
-        width: 70px; height: 70px; background: #4f46e5;
-        color: white; border-radius: 22px; display: inline-flex;
-        align-items: center; justify-content: center; margin-bottom: 25px;
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        width: 80px; 
+        height: 80px; 
+        background: #5d4037 !important; /* بدلي هاد اللون للبني */
+        color: white; 
+        border-radius: 25px; 
+        display: inline-flex;
+        align-items: center; 
+        justify-content: center; 
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .highlight-brown {
+        color: #d38c5d; /* اللون البرتقالي/البني ديال الصفحة الرئيسية */
+        font-weight: bold;
     }
 
     .form-control-premium {
-        background: #f8fafc !important; border: 1.5px solid #f1f5f9 !important;
-        border-radius: 18px !important; padding: 15px 20px !important;
-        font-weight: 500; transition: 0.3s;
+        background: rgba(255, 255, 255, 0.9) !important; /* بيض ناصع باش يبان الكتبه */
+        border: none !important;
+        border-radius: 50px !important; /* شكل دائري بحال Recherche */
+        padding: 14px 25px !important;
+        font-weight: 500;
+        color: #333 !important;
     }
 
-    /* --- هادا هو البوطون لي صلحنا أ وصال --- */
+    /* البوطون البني ديال الصفحة الرئيسية */
     .btn-login-premium {
-        background: #4f46e5 !important; /* لون أزرق ملكي وااااضح */
-        color: white !important; /* كتابة بيضا */
+        background: #5d4037 !important; /* نفس لون "Trouver" */
+        color: white !important;
         border: none;
-        border-radius: 18px;
-        padding: 16px;
+        border-radius: 50px;
+        padding: 15px;
         font-weight: 700;
         width: 100%;
         transition: 0.4s;
         margin-top: 20px;
-        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
-        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
     .btn-login-premium:hover {
-        background: #4338ca !important; /* كيولي أزرق مغلوق شوية عند التمرير */
+        background: #3e2723 !important;
         transform: translateY(-3px);
-        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
     }
+
+    .create-link {
+        color: #d38c5d !important;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .create-link:hover {
+        color: #fff !important;
+        text-decoration: underline;
+    }
+    
+    label { color: white; margin-left: 15px; margin-bottom: 8px; }
 </style>
 
-<div class="container" data-aos="zoom-in">
+<div class="login-container" data-aos="zoom-in">
     <div class="card auth-card">
         <div class="auth-header">
-            <div class="brand-icon"><i class="fas fa-fingerprint fa-2x"></i></div>
-            <h2 class="fw-bold text-dark">Connexion</h2>
-            <p class="text-muted small">Accédez à votre bibliothèque intelligente</p>
+            <div class="brand-icon">
+                <i class="fas fa-fingerprint fa-3x"></i>
+            </div>
+            <h2 class="fw-bold">Connexion</h2>
+            <p class="small">Accédez à <span class="highlight-brown">votre bibliothèque</span> intelligente</p>
         </div>
 
         <div class="auth-body">
             {% if form.errors %}
-                <div class="alert alert-danger border-0 rounded-4 small py-2 text-center">Identifiants incorrects.</div>
+                <div class="alert alert-danger border-0 rounded-4 small py-2 text-center" style="background: rgba(255,0,0,0.2); color: white;">
+                    Identifiants incorrects.
+                </div>
             {% endif %}
 
             <form method="POST">
                 {% csrf_token %}
                 <div class="mb-4">
-                    <label class="form-label small fw-bold text-secondary">Nom d'utilisateur</label>
-                    <input type="text" name="username" class="form-control-premium" placeholder="Ex: atif" required>
+                    <label class="small fw-bold">Nom d'utilisateur</label>
+                    <input type="text" name="username" class="form-control-premium"  required>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label small fw-bold text-secondary">Mot de passe</label>
-                    <input type="password" name="password" class="form-control-premium" placeholder="••••••••" required>
+                    <label class="small fw-bold">Mot de passe</label>
+                    <input type="password" name="password" class="form-control-premium"  required>
                 </div>
-                <button type="submit" class="btn btn-login-premium shadow">Se connecter <i class="fas fa-arrow-right ms-2"></i></button>
+                <button type="submit" class="btn btn-login-premium">
+                    Se connecter <i class="fas fa-arrow-right ms-2"></i>
+                </button>
             </form>
 
             <div class="text-center mt-5">
-                <p class="small text-muted mb-0">Pas encore de compte ?</p>
-                <a href="{% url 'register' %}" class="text-primary fw-bold text-decoration-none">Créer un profil étudiant</a>
+                <p class="small mb-0 text-white-50">Pas encore de compte ?</p>
+                <a href="{% url 'register' %}" class="create-link">Créer un profil étudiant</a>
             </div>
         </div>
     </div>

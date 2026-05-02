@@ -1,159 +1,155 @@
 {% extends "gestion_biblio/base.html" %}
+{% load static %}
 
 {% block content %}
 <style>
-    /* --- ستايل الـ Dashboard الشخصي أ الزين --- */
-    .profile-hero {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        border-radius: 30px;
-        padding: 40px;
-        color: white;
-        margin-bottom: 40px;
-        position: relative;
-        overflow: hidden;
+    /* --- 1. بانر الترحيب --- */
+    .student-hero {
+        background: rgba(62, 39, 35, 0.85) !important;
+        backdrop-filter: blur(15px);
+        border-radius: 40px; padding: 60px 40px; color: white;
+        margin-bottom: 40px; border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     }
-    .profile-hero::after {
-        content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
-        background: rgba(255,255,255,0.1); border-radius: 50%;
-    }
-
-    .stat-box {
-        background: white;
-        border-radius: 24px;
-        padding: 25px;
-        border: 1px solid #f1f5f9;
-        transition: 0.3s;
-        height: 100%;
-    }
-    .stat-box:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
-
-    .table-card {
-        background: white;
-        border-radius: 30px;
-        padding: 40px;
-        border: 1px solid #f1f5f9;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+    .student-hero h1 { font-weight: 800; font-size: 2.8rem; }
+    .status-badge-premium {
+        background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3); color: white;
+        padding: 10px 25px; border-radius: 20px; font-weight: 700;
     }
 
-    .book-title-cell { font-weight: 700; color: var(--dark); font-size: 1.1rem; }
-    
-    .badge-status {
-        padding: 8px 16px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    /* --- 2. صناديق الإحصائيات (مربوطة بالبيانات) --- */
+    .stat-card-glass {
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(10px); border-radius: 30px;
+        padding: 25px; border: 1px solid white; transition: 0.3s;
+        height: 100%; display: flex; align-items: center; gap: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
+    .stat-icon { width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+    .icon-blue { background: #efebe9; color: #5d4037; }
+    .icon-red { background: #fdeaea; color: #991b1b; }
+    .icon-gold { background: #fff8e1; color: #856404; }
 
-    .btn-action-cancel {
-        width: 35px; height: 35px; border-radius: 10px;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: 0.3s; border: 1.5px solid #fee2e2; color: #ef4444;
-    }
-    .btn-action-cancel:hover { background: #ef4444; color: white; border-color: #ef4444; }
+    /* --- 3. جدول الأنشطة --- */
+    .history-card { background: white; border-radius: 40px; padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.03); margin-top: 40px; }
+    .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+    .custom-table th { color: #8e9aaf; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; padding: 15px; }
+    .custom-table td { background: #fdfbfb; padding: 20px 15px; color: #5d4037; font-weight: 600; vertical-align: middle; }
+    .custom-table tr td:first-child { border-radius: 20px 0 0 20px; }
+    .custom-table tr td:last-child { border-radius: 0 20px 20px 0; }
+
+    .btn-cancel-custom { border: 2px solid #fee2e2; color: #dc2626 !important; background: #fef2f2; border-radius: 20px; padding: 5px 15px; font-weight: 700; }
 </style>
 
-<div class="container pb-5" data-aos="fade-up">
+<div class="container py-4" data-aos="fade-up">
     
-    <!-- 1. Banner الترحيب -->
-    <div class="profile-hero shadow-lg" data-aos="zoom-in">
+    <div class="student-hero">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="fw-bold mb-2">Bonjour, {{ request.user.username }} ! 👋</h1>
-                <p class="opacity-75 fs-5 mb-0">Bienvenue dans votre espace lecteur intelligent. Gérez vos lectures en toute simplicité.</p>
+                <h1>Bonjour, {{ request.user.username }} ! 👋</h1>
+                <p class="lead">Gérez vos réservations et suivez vos lectures en temps réel.</p>
             </div>
-            <div class="col-md-4 text-md-end mt-4 mt-md-0">
-                <span class="badge bg-white text-primary p-3 rounded-pill fw-bold">
-                    <i class="fas fa-graduation-cap me-2"></i> Statut : Étudiant
-                </span>
+            <div class="col-md-4 text-md-end">
+                <div class="status-badge-premium"><i class="fas fa-graduation-cap"></i> Étudiant FSBM</div>
             </div>
         </div>
     </div>
 
-    <!-- 2. مربعات الإحصائيات السريعة -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="stat-box d-flex align-items-center">
-                <div class="bg-primary-subtle p-3 rounded-4 me-3 text-primary"><i class="fas fa-book-reader fs-3"></i></div>
-                <div>
-                    <h6 class="text-muted mb-0 small">Emprunts Actifs</h6>
-                    <h3 class="fw-bold mb-0">{{ emprunts.count }}</h3>
+    <!-- Stat Cards (تغيير الأرقام هنا) -->
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="stat-card-glass">
+                <div class="stat-icon icon-blue"><i class="fas fa-book"></i></div>
+                <div class="stat-info">
+                    <h6>Emprunts Actifs</h6>
+                    <h3>{{ emprunts.count }}</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="stat-box d-flex align-items-center">
-                <div class="bg-danger-subtle p-3 rounded-4 me-3 text-danger"><i class="fas fa-exclamation-circle fs-3"></i></div>
-                <div>
-                    <h6 class="text-muted mb-0 small">Retards Détectés</h6>
-                    <h3 class="fw-bold mb-0">{% if any_retard %}Oui{% else %}Aucun{% endif %}</h3>
+        <div class="col-md-4">
+            <div class="stat-card-glass">
+                <div class="stat-icon icon-red"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h6>Retards</h6>
+                    <!-- الرقم كيتغير دبا -->
+                    <h3>{{ total_retards }}</h3> 
                 </div>
             </div>
         </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="stat-box d-flex align-items-center">
-                <div class="bg-warning-subtle p-3 rounded-4 me-3 text-warning"><i class="fas fa-wallet fs-3"></i></div>
-                <div>
-                    <h6 class="text-muted mb-0 small">Solde Amendes</h6>
-                    <h3 class="fw-bold mb-0 text-dark">0 DH</h3>
+        <div class="col-md-4">
+            <div class="stat-card-glass">
+                <div class="stat-icon icon-gold"><i class="fas fa-wallet"></i></div>
+                <div class="stat-info">
+                    <h6>Amendes</h6>
+                    <!-- الثمن كيتجمع دبا -->
+                    <h3>{{ total_amendes }} DH</h3>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 3. طابلو النشاطات -->
-    <div class="table-card shadow-sm" data-aos="fade-up" data-aos-delay="400">
-        <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-history text-primary me-2"></i> Historique de vos activités</h4>
-        
+    <div class="history-card" data-aos="fade-up">
+        <h4><i class="fas fa-history text-primary me-2"></i> Mes Réservations</h4>
+        {% if emprunts %}
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr class="text-secondary small fw-bold border-0">
-                        <th class="py-3 border-0">Ouvrage</th>
-                        <th class="py-3 border-0">Date de retrait</th>
-                        <th class="py-3 border-0">Délai d'échéance</th>
-                        <th class="py-3 border-0">État Actuel</th>
-                        <th class="py-3 border-0 text-end">Options</th>
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Ouvrage</th>
+                        <th>Retrait</th>
+                        <th>Échéance</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for emprunt in emprunts %}
+                    {% for emp in emprunts %}
                     <tr>
-                        <td class="py-4">
-                            <div class="book-title-cell">{{ emprunt.exemplaire.livre.titre }}</div>
-                            <small class="text-muted">{{ emprunt.exemplaire.livre.auteur }}</small>
-                        </td>
-                        <td class="text-muted">{{ emprunt.date_emprunt }}</td>
-                        <td class="text-muted">{{ emprunt.date_retour_prevue }}</td>
+                        <td class="fw-bold">{{ emp.exemplaire.livre.titre }}</td>
+                        <td>{{ emp.date_emprunt|date:"d M Y" }}</td>
+                        <td>{{ emp.date_retour_prevue|date:"d M Y" }}</td>
                         <td>
-                            {% if emprunt.statut == 'en cours' %}
-                                <span class="badge-status bg-primary-subtle text-primary">En Cours</span>
-                            {% elif emprunt.statut == 'en retard' %}
-                                <span class="badge-status bg-danger-subtle text-danger">En Retard</span>
+                            {% if emp.statut == 'en retard' %}
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">En retard</span>
+                            {% elif emp.statut == 'en cours' %}
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">En cours</span>
                             {% else %}
-                                <span class="badge-status bg-success-subtle text-success">Rendu</span>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Rendu</span>
                             {% endif %}
                         </td>
-                        <td class="text-end">
-                            {% if emprunt.statut == 'en cours' or emprunt.statut == 'en retard' %}
-                                <a href="{% url 'annuler_reservation' emprunt.id %}" class="btn-action-cancel" title="Annuler">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <img src="https://illustrations.popsy.co/blue/reading-a-book.svg" style="height: 150px;" class="mb-3">
-                            <p class="text-muted fs-5">Aucun emprunt n'a encore été enregistré.</p>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'detail_livre' emp.exemplaire.livre.id %}" class="btn btn-sm btn-details-custom">Détails</a>
+                                {% if emp.statut != 'rendu' %}
+                                    <a href="{% url 'annuler_reservation' emp.id %}" class="btn btn-sm btn-cancel-custom" onclick="return confirmCancel(event, this.href)">
+                                        <i class="fas fa-times me-1"></i> Annuler
+                                    </a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <div class="text-center py-5"><p class="text-muted fw-bold">Aucune activité pour le moment.</p></div>
+        {% endif %}
     </div>
 </div>
+
+<script>
+    function confirmCancel(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Annuler la réservation ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3e2723',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, annuler'
+        }).then((result) => { if (result.isConfirmed) { window.location.href = url; } });
+    }
+</script>
 {% endblock %}

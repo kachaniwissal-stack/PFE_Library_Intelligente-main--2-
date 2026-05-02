@@ -18,7 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gestion_biblio',       # التطبيق ديالك
+    'gestion_biblio',   
+     'django_apscheduler',
+        # التطبيق ديالك
 ]
 
 # 4. البرمجيات الوسيطة

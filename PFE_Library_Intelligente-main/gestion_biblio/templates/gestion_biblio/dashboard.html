@@ -2,148 +2,168 @@
 
 {% block content %}
 <style>
-    /* --- ستايل الـ Dashboard الفاخر أ وصال --- */
-    .dash-header { margin-bottom: 50px; }
-    .dash-header h1 { font-weight: 800; letter-spacing: -1px; color: var(--dark); }
+    /* --- جعل الخلفية باهتة لتركيز الانتباه --- */
+    #main-bg { filter: brightness(0.8) contrast(0.9) blur(2px) !important; }
 
-    .card-stat-modern {
+    .dash-container { padding-top: 20px; }
+
+    /* كروت الإحصائيات فـ المود العادي */
+    .stat-card-premium {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        transition: 0.3s;
+        text-align: left;
+    }
+    .stat-card-premium:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(79, 70, 229, 0.1); }
+    
+    .icon-circle {
+        width: 50px; height: 50px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: #efebe9 !important; /* خلفية كريمية فاتحة */
+        color: #5d4037 !important; /* أيقونة بنية */
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+
+    .label-premium { color: #8e9aaf; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; }
+    .value-premium { color: #1e293b; font-size: 2.5rem; font-weight: 800; display: block; line-height: 1; }
+
+    /* كروت المبيانات */
+    .chart-card-premium {
         background: white;
         border-radius: 30px;
-        border: 1px solid rgba(0,0,0,0.03);
-        padding: 30px;
-        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .card-stat-modern:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); }
-
-    .icon-shape {
-        width: 60px; height: 60px;
-        border-radius: 18px;
-        display: flex; align-items: center; justify-content: center;
-        margin-bottom: 20px;
-        font-size: 1.5rem;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        border: none;
+        margin-bottom: 30px;
     }
     
-    .bg-soft-blue { background: #e0e7ff; color: #4338ca; }
-    .bg-soft-green { background: #dcfce7; color: #15803d; }
-    .bg-soft-red { background: #fee2e2; color: #b91c1c; }
+    .chart-title { font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+    .chart-title i { color: #8d6e63 !important; }
 
-    .stat-number { font-size: 2.8rem; font-weight: 800; color: var(--dark); line-height: 1; }
-    .stat-label { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
-
-    /* حاويات الداتا */
-    .viz-card { background: white; border-radius: 35px; padding: 40px; border: 1px solid rgba(0,0,0,0.02); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-    
-    .category-pill {
-        background: #f8fafc;
-        border-radius: 20px;
-        padding: 12px 20px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        transition: 0.3s;
+    /* --- تصحيح المود سومبر للـ Dashboard --- */
+    body.dark-mode .stat-card-premium, 
+    body.dark-mode .chart-card-premium {
+        background: rgba(45, 27, 23, 0.95) !important; /* بني ليلي غامق */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     }
-    .category-pill:hover { background: #f1f5f9; transform: scale(1.02); }
+
+    body.dark-mode .stat-value, 
+    body.dark-mode .chart-title,
+    body.dark-mode .value-premium {
+        color: #f8fafc !important; /* لون أبيض كريمي */
+    }
+
+    body.dark-mode .label-premium {
+        color: #d7ccc8 !important;
+    }
+
+    body.dark-mode .icon-circle {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fbbf24 !important; /* أيقونة ذهبية فـ الليل */
+    }
+
+    body.dark-mode .dash-container { background: transparent !important; }
+
 </style>
 
-<div class="container pb-5" data-aos="fade-up">
-    
-    <div class="dash-header text-center" data-aos="fade-down">
-        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-3">ANALYTICS ENGINE</span>
-        <h1>Analyse Stratégique de la Bibliothèque</h1>
-        <p class="text-muted fs-5">Suivi en temps réel des performances et de l'inventaire.</p>
-    </div>
-
-    <!-- 1. مربعات الأرقام (Style Apple/Stripe) -->
+<div class="container dash-container" data-aos="fade-up">
+    <!-- 1. Top Section: Big Numbers -->
     <div class="row g-4 mb-5">
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="card-stat-modern shadow-sm">
-                <div class="icon-shape bg-soft-blue"><i class="fas fa-layer-group"></i></div>
-                <div class="stat-label">Inventaire Global</div>
-                <div class="stat-number my-2">{{ total }}</div>
-                <div class="small text-muted">Titres uniques enregistrés</div>
+        <div class="col-md-4">
+            <div class="stat-card-premium">
+                <div class="icon-circle"><i class="fas fa-book-open"></i></div>
+                <span class="label-premium">Livres dans la base</span>
+                <span class="value-premium">{{ total }}</span>
             </div>
         </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="card-stat-modern shadow-sm">
-                <div class="icon-shape bg-soft-green"><i class="fas fa-check-double"></i></div>
-                <div class="stat-label">Prêts Disponibles</div>
-                <div class="stat-number my-2">{{ disponibles }}</div>
-                <div class="small text-muted text-success fw-bold">Prêt pour consultation</div>
+        <div class="col-md-4">
+            <div class="stat-card-premium">
+                <div class="icon-circle" style="color:#10b981;"><i class="fas fa-check-circle"></i></div>
+                <span class="label-premium">Disponibles</span>
+                <span class="value-premium" style="color:#10b981;">{{ disponibles }}</span>
             </div>
         </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="card-stat-modern shadow-sm">
-                <div class="icon-shape bg-soft-red"><i class="fas fa-exchange-alt"></i></div>
-                <div class="stat-label">Livres en Circulation</div>
-                <div class="stat-number my-2">{{ empruntes }}</div>
-                <div class="small text-muted">Réservations et prêts actifs</div>
+        <div class="col-md-4">
+            <div class="stat-card-premium">
+                <div class="icon-circle" style="color:#f59e0b;"><i class="fas fa-user-clock"></i></div>
+                <span class="label-premium">Emprunts actifs</span>
+                <span class="value-premium" style="color:#f59e0b;">{{ empruntes }}</span>
             </div>
         </div>
     </div>
 
-    <div class="row g-5">
-        <!-- 2. المبيان الدائري الأنيق -->
-        <div class="col-lg-6" data-aos="fade-right">
-            <div class="viz-card h-100">
-                <h4 class="fw-bold mb-5 text-dark"><i class="fas fa-chart-pie me-2 text-primary"></i> Répartition des Genres</h4>
-                <div class="p-3">
-                    <canvas id="categoryChart" style="max-height: 320px;"></canvas>
-                </div>
+    <!-- 2. Bottom Section: Charts -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="chart-card-premium h-100">
+                <h5 class="chart-title"><i class="fas fa-chart-bar"></i> Statistiques par Catégorie</h5>
+                <div style="height: 350px;"><canvas id="cleanBarChart"></canvas></div>
             </div>
         </div>
-
-        <!-- 3. لستة التصنيفات بستايل "Bento" -->
-        <div class="col-lg-6" data-aos="fade-left">
-            <div class="viz-card h-100">
-                <h4 class="fw-bold mb-5 text-dark"><i class="fas fa-list-ul me-2 text-primary"></i> Volume par Catégorie</h4>
-                <div class="pe-2" style="max-height: 400px; overflow-y: auto;">
-                    {% for stat in stats %}
-                    <div class="category-pill shadow-sm border-0">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-dark rounded-circle me-3" style="width: 10px; height: 10px;"></div>
-                            <span class="fw-bold text-dark">{{ stat.categorie }}</span>
-                        </div>
-                        <span class="badge bg-white text-dark border rounded-pill px-3 py-2 fw-bold">
-                            {{ stat.total_cat }} <small class="text-muted">ex.</small>
-                        </span>
-                    </div>
-                    {% endfor %}
-                </div>
+        <div class="col-lg-4">
+            <div class="chart-card-premium h-100">
+                <h5 class="chart-title"><i class="fas fa-chart-pie"></i> Répartition</h5>
+                <div style="height: 350px;"><canvas id="cleanPieChart"></canvas></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script المبيان المطور -->
-     <script>
-const ctx = document.getElementById('categoryChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const labels = {{ labels_js|safe }};
+    const dataValues = {{ data_js|safe }};
+
+    const marronPalette = ['#3e2723', '#5d4037', '#8d6e63', '#a1887f', '#bcaaa4', '#d7ccc8'];
+
+    // 1. Bar Chart
+    new Chart(document.getElementById('cleanBarChart'), {
+        type: 'bar',
         data: {
-            labels: [{% for stat in stats %}"{{ stat.categorie }}",{% endfor %}],
+            labels: labels,
             datasets: [{
-                data: [{% for stat in stats %}{{ stat.total_cat }},{% endfor %}],
-                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#22d3ee'],
-                borderWidth: 8,
-                borderColor: '#ffffff',
-                hoverOffset: 25
+                label: 'Ouvrages',
+                data: dataValues,
+                backgroundColor: '#8d6e63',
+                borderRadius: 10,
+                barThickness: 25,
             }]
         },
         options: {
-            cutout: '75%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { usePointStyle: true, padding: 30, font: { family: 'Plus Jakarta Sans', weight: '600' } }
-                }
-            },
-            animation: { animateScale: true, animateRotate: true }
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
         }
     });
+
+    // 2. Pie Chart
+    new Chart(document.getElementById('cleanPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: marronPalette,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } } }
+        }
+    });
+});
 </script>
 {% endblock %}

@@ -12,184 +12,93 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root { 
-            --primary: #4f46e5; 
-            --nav-bg: #0f172a; 
-            --text-light: rgba(255, 255, 255, 0.85);
-            --bg-body: #f8fafc;
-        }
+    :root { 
+        --primary: #4f46e5; 
+        --nav-marron-fance: #2d1b17; 
+        --text-light: #ffffff;
+    }
 
-        /* --- Mode Sombre أ الزين --- */
-        body.dark-mode { 
-            --bg-body: #020617;
-            color: #f8fafc;
-        }
-        body.dark-mode .glass-card, body.dark-mode .ai-banner, body.dark-mode .card { 
-            background: rgba(30, 41, 59, 0.7) !important; 
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white !important;
-        }
+    #main-bg {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+        background-image: url('/static/images/bg_library.jpg');
+        background-size: cover; background-position: center; background-attachment: fixed;
+        transition: 0.5s;
+    }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); transition: 0.3s; overflow-x: hidden; }
+    .navbar { 
+        background-color: var(--nav-marron-fance) !important; 
+        padding: 15px 0; border-bottom: 2px solid #3e2723;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .navbar-brand, .nav-link { color: white !important; font-weight: 700; }
+    .nav-link:hover { color: #d7ccc8 !important; }
 
-        /* --- الخلفية لي كتحرك (Animated Blobs) --- */
-        .bg-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; background: var(--bg-body); }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: move 20s infinite alternate ease-in-out; }
-        .blob-1 { width: 500px; height: 500px; background: #dbeafe; top: -100px; left: -100px; }
-        .blob-2 { width: 400px; height: 400px; background: #fae8ff; bottom: -50px; right: -50px; animation-delay: -5s; }
-        @keyframes move { from { transform: translate(0, 0); } to { transform: translate(60px, 80px); } }
+    .lang-dropdown { position: relative; display: inline-block; }
+    .lang-btn { background: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid rgba(255,255,255,0.2) !important; transition: 0.3s; }
+    
+    #langMenu {
+        display: none; position: absolute; background: white; top: 110%; right: 0; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-radius: 8px; z-index: 10000; min-width: 130px;
+    }
+    .lang-item { padding: 10px 15px; color: #333 !important; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+    .lang-item:hover { background: #f8f9fa; color: #2d1b17 !important; }
 
-        /* --- Navbar (Style Netflix) --- */
-        .navbar { background-color: var(--nav-bg) !important; padding: 15px 0; border-bottom: 2px solid var(--primary); }
-        .navbar-brand { font-weight: 800; font-size: 1.6rem; color: white !important; letter-spacing: -1px; }
-        .nav-link { color: var(--text-light) !important; font-weight: 600; margin: 0 10px; transition: 0.3s; }
-        .nav-link:hover { color: white !important; transform: translateY(-2px); }
+    body.dark-mode { background-color: #000 !important; }
+    body.dark-mode #main-bg { filter: brightness(0.3) contrast(1.2); }
+    body.dark-mode .card, body.dark-mode .book-card, body.dark-mode .ai-reco-section {
+        background: rgba(30, 20, 20, 0.9) !important; color: white !important;
+    }
 
-        /* بوطون اللغة (Netflix Style) */
-        .lang-dropdown { position: relative; display: inline-block; }
-        .lang-btn {
-            background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 15px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .lang-menu {
-            display: none; position: absolute; top: 110%; right: 0; background: white;
-            min-width: 130px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2000;
-        }
-        .lang-item { padding: 10px 15px; color: #1e293b; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .lang-item:hover { background: #f1f5f9; color: var(--primary); }
+    .theme-toggle {
+        background: rgba(255, 255, 255, 0.1); width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
+        color: #fbbf24 !important; margin-left: 15px;
+    }
 
-        /* خبيو وودجيت جوجل الأصلي */
-        #google_translate_element { display: none !important; }
-        .goog-te-banner-frame { display: none !important; }
-        body { top: 0 !important; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: transparent !important; transition: 0.5s; overflow-x: hidden; top: 0 !important; }
+    #google_translate_element, .goog-te-banner-frame, .skiptranslate { display: none !important; }
+    body { top: 0px !important; }
 
-        .theme-toggle { cursor: pointer; color: white; font-size: 1.2rem; margin-left: 15px; transition: 0.3s; }
-        footer { background: white; padding: 50px 0; border-top: 1px solid #f1f5f9; }
-
-        /* --- قهر شريط جوجل بمرة أ وصال --- */
-iframe.goog-te-banner-frame {
-    display: none !important;
-}
-
-body {
-    top: 0px !important;
-    position: static !important;
-}
-
-.skiptranslate {
-    display: none !important;
-}
-
-/* هادا السطر ضروري باش ما تبقاش بلاصتو خاوية لفوق */
-html {
-    margin-top: 0px !important;
-}
-  .card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-    border-radius: 15px;
-}
-.card:hover {
-    transform: translateY(-10px); /* الكتاب كيطلع شوية */
-    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.2); /* ضل ملون زوين */
-}
-/* ستايل ديال السكرول بار */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #4338ca;
-}
+    #chat-content { display: flex; flex-direction: column; gap: 10px; padding: 15px; }
+    .chat-bubble { max-width: 85%; padding: 10px 15px; border-radius: 18px; font-size: 0.9rem; }
+    .user-msg { align-self: flex-end; background: #8d6e63 !important; color: white !important; border-bottom-right-radius: 4px; }
+    .bot-msg { align-self: flex-start; background: #f1f5f9 !important; color: #334155 !important; border-bottom-left-radius: 4px; }
     </style>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- --- Chatbot UI Button --- -->
-<div id="chatbot-launcher" onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999;">
-    <i class="fas fa-comments fa-lg"></i>
-</div>
 
-<!-- --- Chatbot Window --- -->
-<div id="chat-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; z-index: 9999;">
-    <div style="background: var(--nav-bg); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-        <span><i class="fas fa-robot me-2"></i> Smart-Biblio AI</span>
-        <i class="fas fa-times cursor-pointer" onclick="toggleChat()" style="cursor: pointer;"></i>
-    </div>
-    <div id="chat-content" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc; color: #1e293b;">
-        <p style="background: #e2e8f0; padding: 10px; border-radius: 10px; font-size: 0.9rem;">Bonjour ! Comment puis-je vous aider aujourd'hui ?</p>
-    </div>
-    <div style="padding: 10px; border-top: 1px solid #eee; display: flex; gap: 5px;">
-        <input id="chat-input" type="text" class="form-control" placeholder="Posez votre question..." style="border-radius: 20px;">
-        <button onclick="sendMessage()" class="btn btn-primary" style="border-radius: 50%;"><i class="fas fa-paper-plane"></i></button>
-    </div>
-</div>
-
-<script>
-    function toggleChat() {
-        const chat = document.getElementById('chat-window');
-        chat.style.display = chat.style.display === 'none' || chat.style.display === '' ? 'flex' : 'none';
-    }
-
-    function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const content = document.getElementById('chat-content');
-    const message = input.value.trim();
-
-    if (message !== "") {
-        // 1. عرض رسالة المستخدم
-        content.innerHTML += `<div style="text-align: right; margin-bottom: 10px;">
-            <span style="background: var(--primary); color: white; padding: 8px 12px; border-radius: 15px; display: inline-block; font-size: 0.9rem;">${message}</span>
-        </div>`;
-        
-        input.value = "";
-        content.scrollTop = content.scrollHeight;
-
-        // 2. صيفط الميساج لـ Django
-        fetch('/chatbot-api/', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}' // ضروري باش Django يقبل الطلب
-            },
-            body: JSON.stringify({ message: message })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // 3. عرض جواب الـ IA الحقيقي
-            content.innerHTML += `<div style="text-align: left; margin-bottom: 10px;">
-                <span style="background: #e2e8f0; color: #1e293b; padding: 8px 12px; border-radius: 15px; display: inline-block; font-size: 0.9rem;">${data.reply}</span>
-            </div>`;
-            content.scrollTop = content.scrollHeight;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            content.innerHTML += `<p style="color:red; font-size:0.8rem;">Erreur de connexion au serveur.</p>`;
-        });
-    }
-}
-</script>
 <body>
+    <div id="google_translate_element"></div>
+    <div id="main-bg"></div>
 
-    <div class="bg-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <!-- Chatbot Launcher -->
+    <div id="chatbot-launcher" onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background: #2d1b17; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+        <i class="fas fa-comments fa-lg"></i>
+    </div>
+
+    <div id="chat-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 350px; height: 450px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; z-index: 9999;">
+        <div style="background: #2d1b17; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between;">
+            <span>Smart-Biblio AI</span>
+            <i class="fas fa-times cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-content" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8fafc;">
+            <p>Bonjour ! Comment puis-je vous aider ?</p>
+        </div>
+        <div style="padding: 10px; border-top: 1px solid #eee; display: flex; gap: 5px;">
+            <input id="chat-input" type="text" class="form-control" placeholder="Votre question...">
+            <button onclick="sendMessage()" class="btn btn-dark" style="background:#2d1b17;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg sticky-top shadow-lg">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">Smart<span style="color:var(--primary)">Biblio</span></a>
+            <a class="navbar-brand" href="{% url 'home' %}">Smart<span>Biblio</span></a>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center">
                     
-                    <!-- Language Selector (Netflix Style) -->
                     <div class="lang-dropdown me-3">
-                        <div class="lang-btn" onclick="toggleLangMenu()">
+                        <div class="lang-btn px-3 py-1 rounded-2 cursor-pointer" onclick="toggleLangMenu(event)">
                             <i class="fas fa-globe small"></i> <span id="current-lang">Français</span> <i class="fas fa-caret-down small"></i>
                         </div>
                         <div class="lang-menu" id="langMenu">
@@ -202,76 +111,104 @@ html {
                     <a class="nav-link" href="{% url 'home' %}">Accueil</a>
 
                     {% if not user.is_authenticated %}
-                       <a class="nav-link px-3" href="{% url 'login' %}">
-                     <i class="fas fa-sign-in-alt me-1"></i> Connexion
-                      </a>
-                        <a class="nav-link" href="/admin/">Accès Admin</a>
+                        <a class="nav-link px-3" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Se connecter
+                        </a>
+                        <a class="nav-link" href="/admin/">Administration</a>
                     {% else %}
                         <a class="nav-link" href="{% url 'mon_espace' %}">Mon Espace</a>
                         <a class="nav-link text-primary fw-bold" href="{% url 'dashboard' %}">📊 Dashboard</a>
+                        {% if user.is_superuser %}
+                            <a class="nav-link text-warning fw-bold" href="/admin/">⚙️ Admin</a>
+                        {% endif %}
                         <a class="nav-link text-danger" href="{% url 'logout' %}"><i class="fas fa-power-off"></i></a>
                     {% endif %}
 
-                    <div class="theme-toggle" onclick="toggleDarkMode()" id="themeIcon"><i class="fas fa-moon"></i></div>
+                    <div class="theme-toggle" onclick="toggleDarkMode()" id="themeIcon">
+                        <i class="fas fa-moon"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="container py-5 min-vh-100">
-        {% if messages %}{% for m in messages %}<div class="alert alert-primary shadow-sm rounded-4">{{ m }}</div>{% endfor %}{% endif %}
+    <div class="container py-5 min-vh-100" style="position: relative; z-index: 1;">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- العنصر المخفي لي غادي يخدم الترجمة -->
-    <div id="google_translate_element"></div>
-
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    
-    <script type="text/javascript">
-        // 1. ترجمة جوجل
-        function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-        pageLanguage: 'fr',
-        includedLanguages: 'ar,en,fr',
-        autoDisplay: false
-    }, 'google_translate_element');
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    // --- الحيلة الذكية: مسح الشريط بمجرد ما يتولد ---
-    var interval = setInterval(function() {
-        var googleFrame = document.querySelector('.goog-te-banner-frame');
-        if (googleFrame) {
-            googleFrame.style.display = 'none';
-            document.body.style.top = '0px';
-            document.documentElement.style.marginTop = '0px';
-            clearInterval(interval);
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'fr',
+                includedLanguages: 'ar,en,fr',
+                autoDisplay: false
+            }, 'google_translate_element');
         }
-    }, 100); // كيبقى يقلب كل 100 ميلي ثانية حتى يلقاه ويطفيييه
-}
+
         function changeLanguage(langCode, langName) {
             const selectEl = document.querySelector('.goog-te-combo');
             if (selectEl) {
                 selectEl.value = langCode;
                 selectEl.dispatchEvent(new Event('change'));
                 document.getElementById('current-lang').innerText = langName;
-                toggleLangMenu();
             }
-        }
-        function toggleLangMenu() {
-            const menu = document.getElementById('langMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            document.getElementById('langMenu').style.display = 'none';
         }
 
-        // 2. المود سومبر
+        function toggleLangMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('langMenu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        window.onclick = function() {
+            const menu = document.getElementById('langMenu');
+            if (menu) menu.style.display = 'none';
+        }
+
+        function toggleChat() {
+            const chat = document.getElementById('chat-window');
+            chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const content = document.getElementById('chat-content');
+            if (input.value.trim() !== "") {
+                content.innerHTML += `<div class="chat-bubble user-msg">${input.value}</div>`;
+                const msg = input.value; input.value = "";
+                fetch('/chatbot-api/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' }, body: JSON.stringify({ message: msg }) })
+                .then(res => res.json()).then(data => {
+                    content.innerHTML += `<div class="chat-bubble bot-msg">${data.reply}</div>`;
+                    content.scrollTop = content.scrollHeight;
+                });
+            }
+        }
+
         function toggleDarkMode() {
             const body = document.body, icon = document.querySelector('#themeIcon i');
             body.classList.toggle('dark-mode');
             if(body.classList.contains('dark-mode')) { icon.classList.replace('fa-moon', 'fa-sun'); localStorage.setItem('theme', 'dark'); }
             else { icon.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); }
         }
-        if(localStorage.getItem('theme') === 'dark') toggleDarkMode();
-        AOS.init({ duration: 800, once: true });
+
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            setTimeout(() => { if(document.querySelector('#themeIcon i')) document.querySelector('#themeIcon i').classList.replace('fa-moon', 'fa-sun'); }, 100);
+        }
+
+        AOS.init();
+
+        {% if messages %}
+            {% for m in messages %}
+                Swal.fire({ icon: 'success', title: 'Notification', text: '{{ m }}', timer: 3000, showConfirmButton: false, toast: true, position: 'top-end' });
+            {% endfor %}
+        {% endif %}
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
