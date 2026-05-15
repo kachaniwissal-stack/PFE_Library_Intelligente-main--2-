@@ -1,13 +1,14 @@
 import json
 import pandas as pd
-import google.generativeai as genai
+import requests
+import time
 from datetime import date
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q, Count, Avg
+from django.db.models import Q, Count
 from django.utils import timezone
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
@@ -17,28 +18,25 @@ from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User 
+from django.contrib.admin.views.decorators import staff_member_required
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
-# --- استيراد الموديلات والفورم ---
+ 
 from .models import Livre, Emprunt, Etudiant, Exemplaire, Note, ListeAttente
 from .forms import RegisterForm
-
-# --- إعداد ذكاء Gemini ---
-GOOGLE_API_KEY = "AIzaSy..." 
-genai.configure(api_key=GOOGLE_API_KEY)
-ai_model = genai.GenerativeModel('gemini-pro')
-
-# 1. الدخول والخروج
+from groq import Groq
+ 
+client = Groq(api_key="")
+ 
+ 
 class StudentLoginView(LoginView):
     template_name = 'gestion_biblio/login.html'
     def get_success_url(self): return '/mon-espace/'
-
+ 
 def logout_user(request):
     logout(request)
     return redirect('home')
-
-# دالة التسجيل
+ 
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -46,7 +44,13 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False 
             user.save()
-            Etudiant.objects.create(user=user, cne=form.cleaned_data.get('cne'), niveau_etude=form.cleaned_data.get('niveau_etude'))
+            
+            Etudiant.objects.create(
+                user=user, 
+                cne=form.cleaned_data.get('cne'), 
+                niveau_etude=form.cleaned_data.get('niveau_etude')
+            )
+ 
             try:
                 current_site = get_current_site(request)
                 mail_subject = 'Activez votre compte Smart-Biblio 📚'
@@ -58,10 +62,12 @@ def register(request):
                 email = EmailMessage(mail_subject, message, to=[user.email])
                 email.send()
                 return render(request, 'gestion_biblio/check_email.html')
-            except: return redirect('login')
-    else: form = RegisterForm()
+            except Exception as e:
+                return redirect('login') 
+    else:
+        form = RegisterForm()
     return render(request, 'gestion_biblio/register.html', {'form': form})
-
+ 
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -73,45 +79,59 @@ def activate(request, uidb64, token):
         login(request, user)
         return redirect('home')
     return render(request, 'gestion_biblio/activation_invalid.html')
-
-# --- 2. فضاء الطالب (المعدلة لحساب التأخير والغرامات) ---
+ 
+# --- 2. فضاء الطالب ---
 def mon_espace(request):
     if not request.user.is_authenticated: return redirect('login')
+
     try:
         etudiant = Etudiant.objects.get(user=request.user)
-        historique = Emprunt.objects.filter(etudiant=etudiant).order_by('-date_emprunt')
+        historique = Emprunt.objects.filter(etudiant=etudiant, statut__in=['en cours', 'en retard']).order_by('-date_emprunt')
         today = date.today()
-        
-        # متغيرات الحساب
-        total_retards = 0
-        total_amendes = 0
 
         for emp in historique:
-            # تحديث حالة التأخير وحساب الغرامة
-            if emp.statut != 'rendu' and emp.date_retour_prevue < today:
-                days_late = (today - emp.date_retour_prevue).days
-                emp.amende = days_late * 5 # 5 دراهم لليوم
-                emp.statut = 'en retard'
-                if not emp.alerte_envoyee:
+            # --- تأكيد التذكير ديال اليوم أ وصال ---
+            if emp.date_retour_prevue == today:
+                if not emp.rappel_envoye:
+                    subject = f"⚠️ DERNIER DÉLAI : {emp.exemplaire.livre.titre}"
+                    msg = f"Bonjour {request.user.username}, c'est aujourd'hui le dernier délai pour rendre votre livre. Évitez les amendes ! 😊"
+                    
                     try:
-                        send_mail(f"🚨 RETARD : {emp.exemplaire.livre.titre}", f"Amende: {emp.amende} DH.", 'admin@smartbiblio.com', [request.user.email])
-                        emp.alerte_envoyee = True
-                    except: pass
-                emp.save()
+                        # كنأكدو أننا كنصيفطو لـ إيميل الطالب الحقيقي
+                        send_mail(subject, msg, 'notif@smartbiblio.com', [request.user.email])
+                        emp.rappel_envoye = True
+                        emp.save()
+                        print(f"✅ Rappel envoyé avec succès à {request.user.email}")
+                    except Exception as e:
+                        print(f"❌ Erreur Envoi: {e}")
 
-            # جمع الإحصائيات الفردية
-            if emp.statut == 'en retard':
-                total_retards += 1
-                total_amendes += emp.amende
-
-        return render(request, 'gestion_biblio/espace_etudiant.html', {
-            'emprunts': historique,
-            'total_retards': total_retards,
-            'total_amendes': total_amendes
-        })
-    except: return redirect('register')
-
-# 3. نظام التوصية والبحث
+        return render(request, 'gestion_biblio/espace_etudiant.html', {'emprunts': historique})
+    except:
+        return redirect('register')
+ 
+# --- 3. لوحة تحكم الأدمين ---
+@staff_member_required
+def dashboard(request):
+    total_livres = Livre.objects.count()
+    livres_disponibles = Exemplaire.objects.filter(est_disponible=True).count()
+    emprunts_actifs = Emprunt.objects.filter(statut='en_cours').count()
+ 
+    stats = Livre.objects.values('categorie').annotate(total=Count('id'))
+    
+    labels = [s['categorie'] for s in stats if s['categorie']]
+    data = [s['total'] for s in stats if s['categorie']]
+ 
+    context = {
+        'total': total_livres,
+        'disponibles': livres_disponibles,
+        'empruntes': emprunts_actifs,
+        'labels_js': json.dumps(labels),
+        'data_js': json.dumps(data),
+        'is_admin': True
+    }
+    return render(request, 'gestion_biblio/dashboard.html', context)
+ 
+# --- 4. نظام البحث والتوصية ---
 def get_smart_recommendations(user):
     livres = Livre.objects.all()
     if livres.count() < 2: return list(livres)
@@ -125,52 +145,62 @@ def get_smart_recommendations(user):
         indices = sorted(list(enumerate(sim)), key=lambda x: x[1], reverse=True)[1:5]
         return Livre.objects.filter(id__in=[df.iloc[i[0]]['id'] for i in indices])
     except: return Livre.objects.all().order_by('?')[:4]
-
+ 
 def home(request):
     query = request.GET.get('q')
+    selected_category = request.GET.get('category')
     livres = Livre.objects.all()
-    alternative_results, is_not_found = [], False
+    all_categories = Livre.objects.values_list('categorie', flat=True).distinct()
+ 
+    if selected_category:
+        livres = livres.filter(categorie=selected_category)
+ 
+    # ✅ البحث مصلح
     if query:
-        search_results = livres.filter(Q(titre__icontains=query) | Q(auteur__icontains=query))
-        if search_results.exists(): livres = search_results
-        else:
-            is_not_found, livres = True, []
-            alternative_results = get_smart_recommendations(request.user)[:3]
-    for livre in (alternative_results if is_not_found else livres):
+        livres = livres.filter(
+            Q(titre__icontains=query) |
+            Q(auteur__icontains=query) |
+            Q(categorie__icontains=query)
+        )
+ 
+    for livre in livres:
         livre.disponible = livre.exemplaires.filter(est_disponible=True).exists()
+ 
     recommandations = get_smart_recommendations(request.user) if request.user.is_authenticated else Livre.objects.all().order_by('?')[:4]
-    for r in recommandations: r.disponible = r.exemplaires.filter(est_disponible=True).exists()
-    return render(request, 'gestion_biblio/index.html', {'livres': livres, 'recommandations': recommandations, 'query': query, 'is_not_found': is_not_found, 'alternative_results': alternative_results})
-
-# 4. الشات بوت
-@csrf_exempt
-def chatbot_response(request):
-    import json
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            msg = data.get('message', '').strip().lower()
-            if any(word in msg for word in ["salut", "bonjour"]): reply = "Bonjour ! 😊 Comment puis-je vous aider ?"
-            elif "livre" in msg: reply = "Vous pouvez chercher des livres dans la barre de recherche ! 📚"
-            elif "retard" in msg or "amende" in msg: reply = "L'amende est de 5 DH par jour. Vérifiez 'Mon Espace'."
-            else: reply = "Je suis là pour vous aider avec les réservations."
-            return JsonResponse({'reply': reply})
-        except: return JsonResponse({'reply': "Désolé, erreur technique."})
-    return JsonResponse({'reply': 'Erreur'})
-
-# 5. دوال الحجز والإلغاء
+    for r in recommandations:
+        r.disponible = r.exemplaires.filter(est_disponible=True).exists()
+ 
+    context = {
+        'livres': livres,
+        'all_categories': all_categories,
+        'selected_category': selected_category,
+        'query': query,
+        'recommandations': recommandations,
+    }
+    return render(request, 'gestion_biblio/index.html', context)
+ 
+# --- 5. الحجز والإضافات ---
+def detail_livre(request, id):
+    livre = get_object_or_404(Livre, id=id)
+    dispo = livre.exemplaires.filter(est_disponible=True).exists()
+    return render(request, 'gestion_biblio/detail.html', {'livre': livre, 'disponible': dispo})
+ 
 def reserver_livre(request, id):
     if not request.user.is_authenticated: return redirect('register')
-    etudiant = Etudiant.objects.get(user=request.user)
-    livre = get_object_or_404(Livre, id=id)
-    ex = Exemplaire.objects.filter(livre=livre, est_disponible=True).first()
-    if ex:
-        ex.est_disponible = False
-        ex.save()
-        Emprunt.objects.create(etudiant=etudiant, exemplaire=ex, date_retour_prevue=date.today() + timezone.timedelta(days=15))
-        messages.success(request, "Votre livre a été réservé ! 📚")
-    return redirect('mon_espace')
-
+    try:
+        etudiant = Etudiant.objects.get(user=request.user)
+        livre = get_object_or_404(Livre, id=id)
+        ex = Exemplaire.objects.filter(livre=livre, est_disponible=True).first()
+        if ex:
+            ex.est_disponible = False
+            ex.save()
+            Emprunt.objects.create(etudiant=etudiant, exemplaire=ex, date_retour_prevue=date.today() + timezone.timedelta(days=15))
+            messages.success(request, "Votre livre a été réservé ! 📚")
+        return redirect('mon_espace')
+    except Etudiant.DoesNotExist:
+        messages.error(request, "Action réservée aux étudiants.")
+        return redirect('home')
+ 
 def annuler_reservation(request, emprunt_id):
     emp = get_object_or_404(Emprunt, id=emprunt_id, etudiant__user=request.user)
     if emp.statut != 'rendu':
@@ -180,36 +210,70 @@ def annuler_reservation(request, emprunt_id):
         emp.delete()
         messages.success(request, "Votre réservation a été annulée. ✅")
     return redirect('mon_espace')
-
-# 6. باقي الدوال
-def detail_livre(request, id):
-    livre = get_object_or_404(Livre, id=id)
-    dispo = livre.exemplaires.filter(est_disponible=True).exists()
-    return render(request, 'gestion_biblio/detail.html', {'livre': livre, 'disponible': dispo})
-
-def dashboard(request):
-    import json
-    stats = Livre.objects.values('categorie').annotate(total_cat=Count('id'))
-    labels_list = [str(s['categorie']) for s in stats]
-    data_list = [int(s['total_cat']) for s in stats]
-    return render(request, 'gestion_biblio/dashboard.html', {
-        'total': Livre.objects.count(),
-        'disponibles': Exemplaire.objects.filter(est_disponible=True).count(),
-        'empruntes': Emprunt.objects.filter(statut='en cours').count(),
-        'labels_js': json.dumps(labels_list),
-        'data_js': json.dumps(data_list),
-    })
-
+ 
 def ajouter_note(request, id):
-    if request.method == "POST": 
-        Note.objects.create(livre=get_object_or_404(Livre, id=id), etudiant=Etudiant.objects.get(user=request.user), valeur=request.POST.get('valeur'))
-        messages.success(request, "Votre note a été enregistrée ! ⭐")
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            messages.info(request, "Veuillez vous inscrire ou vous connecter pour pouvoir noter un livre. 😊")
+            return redirect('register')
+            
+        livre = get_object_or_404(Livre, id=id)
+        try:
+            etudiant = Etudiant.objects.get(user=request.user)
+            valeur = request.POST.get('valeur')
+            commentaire = request.POST.get('commentaire')
+            Note.objects.create(livre=livre, etudiant=etudiant, valeur=valeur, commentaire=commentaire)
+            messages.success(request, "Merci pour votre avis ! ⭐")
+        except Etudiant.DoesNotExist:
+            messages.error(request, "Action réservée aux étudiants.")
+            
     return redirect('detail_livre', id=id)
-
+ 
 def rejoindre_attente(request, livre_id):
     if not request.user.is_authenticated: return redirect('register')
     livre = get_object_or_404(Livre, id=livre_id)
-    etudiant = Etudiant.objects.get(user=request.user)
-    ListeAttente.objects.get_or_create(livre=livre, etudiant=etudiant)
-    messages.success(request, "Vous avez été ajouté à la liste d'attente ! 📧")
+    try:
+        etudiant = Etudiant.objects.get(user=request.user)
+        ListeAttente.objects.get_or_create(livre=livre, etudiant=etudiant)
+        messages.success(request, "Vous avez été ajouté à la liste d'attente ! 📧")
+    except Etudiant.DoesNotExist: pass
+    return redirect('detail_livre', id=livre_id)
+ 
+# --- 6. الشات بوت ---
+@csrf_exempt
+def chatbot_response(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            msg = data.get('message', '').strip()
+ 
+            livres = Livre.objects.all().values('titre', 'auteur', 'categorie')
+            livres_list = "\n".join([f"- {l['titre']} ({l['categorie']}) par {l['auteur']}" for l in livres])
+ 
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": f"""Tu es Smart-Biblio AI, assistant de la bibliothèque Smart-Biblio.
+Réponds en français en maximum 2-3 phrases courtes.
+Tu comprends aussi l'arabe et le darija marocain.
+ 
+Voici les livres disponibles dans notre bibliothèque :
+{livres_list}
+ 
+Base tes recommandations UNIQUEMENT sur ces livres.
+Question : {msg}"""}]
+            )
+            return JsonResponse({'reply': completion.choices[0].message.content})
+ 
+        except Exception as e:
+            print(f"System Error: {e}")
+            return JsonResponse({'reply': "Désolé, souci technique. 😊"})
+ 
+    return JsonResponse({'reply': 'Erreur'})
+ 
+# --- 7. حذف التعليق ---
+def supprimer_note(request, note_id):
+    note = get_object_or_404(Note, id=note_id, etudiant__user=request.user)
+    livre_id = note.livre.id
+    note.delete()
+    messages.success(request, "Votre avis a été supprimé. ✅")
     return redirect('detail_livre', id=livre_id)

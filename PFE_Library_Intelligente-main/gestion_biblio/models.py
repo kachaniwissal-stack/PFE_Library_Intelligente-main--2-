@@ -6,10 +6,29 @@ from django.core.mail import send_mail
 
 class Etudiant(models.Model):
     NIVEAU_CHOICES = [
-        ('', '--- Choisir ---'), ('L1-MIP', 'L1 (MIP)'), ('L1-SPC', 'L1 (SPC)'), ('L1-BCG', 'L1 (BCG)'),
-        ('L2-MIP', 'L2 (MIP)'), ('L2-SPC', 'L2 (SPC)'), ('L2-BCG', 'L2 (BCG)'),
-        ('L3-Info', 'L3 Info'), ('M1', 'Master 1'), ('M2', 'Master 2'),
+
+        ('L1_BCG', 'Licence 1ère année - BCG'),
+        ('L1_MIP', 'Licence 1ère année - MIP'),
+        ('L1_PC', 'Licence 1ère année - PC'),
+
+        ('L2_BCG', 'Licence 2ème année - BCG'),
+        ('L2_MIP', 'Licence 2ème année - MIP'),
+        ('L2_PC', 'Licence 2ème année - PC'),
+
+        ('L3_BCG', 'Licence 3ème année - BCG'),
+        ('L3_MIP', 'Licence 3ème année - MIP'),
+        ('L3_PC', 'Licence 3ème année - PC'),
+
+        ('MASTER_1', 'Master 1ère année'),
+        ('MASTER_2', 'Master 2ème année'),
     ]
+
+
+
+
+
+
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     cne = models.CharField(max_length=20)
     niveau_etude = models.CharField(max_length=50, choices=NIVEAU_CHOICES)
@@ -44,6 +63,7 @@ class Note(models.Model):
     livre = models.ForeignKey(Livre, on_delete=models.CASCADE, related_name="notes")
     etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE)
     valeur = models.IntegerField(default=5)
+    commentaire = models.TextField(blank=True, null=True) 
 
 class ListeAttente(models.Model):
      livre = models.ForeignKey(Livre, on_delete=models.CASCADE, related_name="attente")
@@ -75,3 +95,10 @@ def notifier_liste_attente(sender, instance, **kwargs):
             )
             # مسحو من اللائحة حيت صافي علمناه
             attente.delete()
+# --- الكود المصحح للفراغات أ الزين ---
+class EtudiantAutorise(models.Model):
+    code_apogee = models.CharField(max_length=20, unique=True)
+    nom_complet = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.code_apogee} - {self.nom_complet}"

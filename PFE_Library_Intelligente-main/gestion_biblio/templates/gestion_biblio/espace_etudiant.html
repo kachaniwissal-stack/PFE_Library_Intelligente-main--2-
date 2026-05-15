@@ -47,7 +47,7 @@
     <div class="student-hero">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1>Bonjour, {{ request.user.username }} ! 👋</h1>
+                <h1>Bonjour, {{ request.user.get_full_name|title }} ! </h1>
                 <p class="lead">Gérez vos réservations et suivez vos lectures en temps réel.</p>
             </div>
             <div class="col-md-4 text-md-end">

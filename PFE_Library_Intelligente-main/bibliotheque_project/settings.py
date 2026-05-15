@@ -11,7 +11,7 @@ ALLOWED_HOSTS = []
 
 # 3. التطبيقات المسجلة
 INSTALLED_APPS = [
-    'jazzmin',              # هادي هي اللولة ضروري أ وصال
+    'jazzmin',              
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -19,8 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gestion_biblio',   
-     'django_apscheduler',
-        # التطبيق ديالك
+    'django_apscheduler',
 ]
 
 # 4. البرمجيات الوسيطة
@@ -70,21 +69,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'mon_espace'
 
-# 8. إعدادات إرسال الإيميلات الاحترافية (Brevo / Sendinblue)
-# إعدادات Brevo الاحترافية - النسخة المصححة
-# إعدادات Gmail المضمونة 100% للـ PFE
+# 8. إعدادات إرسال الإيميلات
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-# إيميلك لي خديتي منو الكود
 EMAIL_HOST_USER = 'kachaniwissal@gmail.com' 
-
-# كود الـ 16 حرف لي عاد خديتي دابا (حطيه هنا بلا فراغات)
 EMAIL_HOST_PASSWORD ='qghowixpbebnjkbe'
-
-# هاد السطر هو لي كيبان للمستخدم فـ Boîte mail ديالو
 DEFAULT_FROM_EMAIL = 'Smart-Biblio <kachaniwissal@gmail.com>'
 
 # 9. إعدادات اللغة والتوقيت
@@ -95,6 +86,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# --- تعديل إعدادات JAZZMIN هنا أ وصال ---
 JAZZMIN_SETTINGS = {
     "site_title": "Smart Biblio Admin",
     "site_header": "Smart-Biblio",
@@ -102,5 +94,11 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Bienvenue dans l'espace de gestion Smart-Biblio",
     "copyright": "Wissal & Ilham PFE",
     "search_model": ["auth.User", "gestion_biblio.Livre"],
-    "show_ui_builder": True, # هادي واعرة: غاتخليك تبدلي الألوان نيشان من السيت!
+    "show_ui_builder": True, 
+
+    # هادو هما الروابط اللي زدت ليك باش يبانو الفوق عند الأدمين
+    "topmenu_links": [
+        {"name": "Accueil Site", "url": "home", "icon": "fas fa-home"},
+        {"name": "Dashboard Étudiants", "url": "dashboard", "icon": "fas fa-chart-line"},
+    ],
 }

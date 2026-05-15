@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Etudiant, Livre, Exemplaire, Emprunt, Note, ListeAttente
+from .models import Etudiant, Livre, Exemplaire, Emprunt, Note, ListeAttente, EtudiantAutorise
 
 # تخصيص واجهة الكتاب باش تبين عدد النسخ
 class LivreAdmin(admin.ModelAdmin):
@@ -17,3 +17,4 @@ admin.site.register(Etudiant)
 admin.site.register(Emprunt)
 admin.site.register(Note)
 admin.site.register(ListeAttente)
+admin.site.register(EtudiantAutorise)

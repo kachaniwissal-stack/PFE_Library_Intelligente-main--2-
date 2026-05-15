@@ -2,79 +2,103 @@
 
 {% block content %}
 <style>
-    /* --- تصحيح الروابط الفوقانية (Breadcrumbs) لتصبح بيضاء --- */
-    .breadcrumb-item a { 
-        color: white !important; 
-        font-weight: 700; 
-        text-shadow: 0 2px 5px rgba(0,0,0,0.5); 
-        text-decoration: none;
-        transition: 0.3s;
-    }
+    /* --- التنسيقات الأساسية --- */
+    .breadcrumb-item a { color: white !important; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.5); text-decoration: none; transition: 0.3s; }
     .breadcrumb-item a:hover { color: #d7ccc8 !important; }
-    
-    /* لون النص الحالي (Active) والشرطة المائلة */
     .breadcrumb-item.active { color: rgba(255,255,255,0.8) !important; font-weight: 600; }
     .breadcrumb-item + .breadcrumb-item::before { color: white !important; }
 
-    /* ستايل الكارط والكتب */
-    .detail-card { border-radius: 35px; border: none; overflow: hidden; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+    .detail-card { border-radius: 35px; border: none; overflow: hidden; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.1); transition: 0.3s; }
     .book-cover-large { border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: 0.4s; width: 100%; max-height: 480px; object-fit: cover; }
     .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; }
     
-    /* ستايل التقييم */
     .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 5px; }
     .star-rating input { display: none; }
     .star-rating label { font-size: 32px; color: #cbd5e1; cursor: pointer; transition: 0.2s; }
     .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #f59e0b; }
 
-    .rating-box { background: #fdfbfb; border-radius: 30px; border: 1px solid #f1f5f9; padding: 30px; }
-    
-    /* بوطونة الحجز */
-    .btn-reserve { background: #3e2723; color: white; border: none; font-weight: 800; border-radius: 20px; transition: 0.4s; }
-    .btn-reserve:hover { background: #5d4037; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(62, 39, 35, 0.2); }
+    .rating-box-premium { background: #fdfbfb; border-radius: 30px; border: 1px solid #f1f5f9; padding: 30px; }
+    .avis-container { background: #ffffff; border-radius: 30px; padding: 40px; margin-top: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .avis-item { border-bottom: 1px solid #f1f5f9; padding: 25px 0; transition: 0.3s; }
+    .user-avatar { width: 45px; height: 45px; background: #efebe9; color: #5d4037; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-    /* بوطونة العودة (Marron Style) */
-    .btn-return-custom {
-        border: 2px solid #8d6e63;
-        color: #8d6e63 !important;
-        border-radius: 20px;
-        font-weight: 800;
-        transition: 0.3s;
-        background: transparent;
+    .btn-dark-premium { background: #3e2723; color: white !important; border: none; font-weight: 800; border-radius: 20px; padding: 12px 30px; transition: 0.4s; display: inline-block; text-decoration: none; }
+    .btn-dark-premium:hover { background: #5d4037; transform: translateY(-3px); }
+    .btn-return-custom { border: 2px solid #8d6e63; color: #8d6e63 !important; border-radius: 20px; font-weight: 800; transition: 0.3s; background: transparent; }
+    .btn-return-custom:hover { background: #8d6e63; color: white !important; }
+    .btn-delete-avis { color: #ef4444; opacity: 0.4; transition: 0.3s; cursor: pointer; border: none; background: none; }
+    .btn-delete-avis:hover { opacity: 1; }
+
+    /* --- إعدادات الـ Dark Mode الاحترافية أ وصال --- */
+    body.dark-mode .detail-card, 
+    body.dark-mode .avis-container,
+    body.dark-mode .rating-box-premium {
+        background: rgba(30, 20, 18, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f8fafc !important;
     }
-    .btn-return-custom:hover {
-        background: #8d6e63;
+
+    body.dark-mode h1, 
+    body.dark-mode h4, 
+    body.dark-mode h5, 
+    body.dark-mode h6, 
+    body.dark-mode strong {
+        color: #ffffff !important;
+    }
+
+    body.dark-mode .text-muted, 
+    body.dark-mode p {
+        color: #d1d5db !important;
+    }
+
+    body.dark-mode .info-label {
+        color: #a1887f !important;
+    }
+
+    body.dark-mode textarea {
+        background: rgba(255, 255, 255, 0.05) !important;
         color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    .sim-card { transition: 0.4s; border-radius: 25px; border: none; background: #fdfbfb; }
-    .sim-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+    body.dark-mode .user-avatar {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fbbf24 !important;
+    }
+
+    body.dark-mode .avis-item {
+        border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    /* إصلاح وضوح الـ Placeholder في الدارك مود أ وصال */
+body.dark-mode textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important; /* لون أبيض شفاف باش يبان واضح */
+}
+
+body.dark-mode textarea {
+    color: white !important; /* باش حتى الكتابة اللي كتكتبي تبان بيضاء */
+}
 </style>
 
 <div class="container mt-4 mb-5">
-    <!-- Breadcrumbs (الروابط البيضاء) -->
-    <nav aria-label="breadcrumb" class="mb-4" data-aos="fade-down">
+    <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ livre.titre }}</li>
+            <li class="breadcrumb-item active">{{ livre.titre }}</li>
         </ol>
     </nav>
 
     <div class="card detail-card p-4 p-md-5" data-aos="zoom-in">
         <div class="row g-5">
-            <!-- غلاف الكتاب -->
             <div class="col-md-4 text-center">
                 {% if livre.image %}
-                    <img src="{{ livre.image.url }}" class="img-fluid book-cover-large mb-4" alt="{{ livre.titre }}">
+                    <img src="{{ livre.image.url }}" class="img-fluid book-cover-large mb-4">
                 {% endif %}
-                
                 <div class="mt-2">
                     <span class="text-warning fs-4 fw-bold"><i class="fas fa-star"></i> {{ moyenne|default:"5.0" }}/5</span>
                     <p class="small text-muted">Basé sur {{ livre.notes.count }} avis</p>
                 </div>
             </div>
 
-            <!-- معلومات الكتاب -->
             <div class="col-md-8">
                 <span class="badge mb-3" style="background:#efebe9; color:#5d4037; padding: 8px 15px; border-radius: 10px;">{{ livre.categorie }}</span>
                 <h1 class="display-5 fw-bold mb-2" style="color: #3e2723;">{{ livre.titre }}</h1>
@@ -83,55 +107,101 @@
                 <div class="row mb-4 mt-4">
                     <div class="col-6">
                         <p class="info-label mb-1">Code ISBN</p>
-                        <p class="fw-bold" style="color: #2d1b17;">{{ livre.isbn }}</p>
+                        <p class="fw-bold">{{ livre.isbn }}</p>
                     </div>
                     <div class="col-6">
                         <p class="info-label mb-1">Statut</p>
-                        <p class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Disponible</p>
+                        {% if disponible %}
+                            <p class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Disponible</p>
+                        {% else %}
+                            <p class="text-danger fw-bold"><i class="fas fa-times-circle me-1"></i> Indisponible</p>
+                        {% endif %}
                     </div>
                 </div>
 
                 <hr class="opacity-10 mb-4">
-
                 <h5 class="fw-bold mb-3" style="color: #3e2723;"><i class="fas fa-quote-left me-2 opacity-50"></i> Résumé</h5>
                 <p class="text-muted" style="line-height: 1.8; text-align: justify; font-size: 1.05rem;">
-                    {{ livre.description|default:"Aucune description disponible pour cet ouvrage." }}
+                    {{ livre.description|default:"Aucune description disponible." }}
                 </p>
 
-                <!-- التقييم -->
-                <div class="rating-box mt-5 shadow-sm">
-                    <h6 class="fw-bold mb-3" style="color: #3e2723;">Évaluez cet ouvrage ⭐</h6>
-                    <form action="{% url 'ajouter_note' livre.id %}" method="POST" class="d-flex align-items-center gap-4">
+                <!-- صندوق التقييم -->
+                {% if not user.is_staff %}
+                <div class="rating-box-premium shadow-sm mt-5" data-aos="fade-up">
+                    <h6 class="fw-bold mb-3" style="color: #3e2723;">Laissez votre avis ⭐</h6>
+                    <form action="{% url 'ajouter_note' livre.id %}" method="POST">
                         {% csrf_token %}
-                        <div class="star-rating">
+                        <div class="star-rating mb-3">
                             <input type="radio" id="star5" name="valeur" value="5" required /><label for="star5">★</label>
                             <input type="radio" id="star4" name="valeur" value="4" /><label for="star4">★</label>
                             <input type="radio" id="star3" name="valeur" value="3" /><label for="star3">★</label>
                             <input type="radio" id="star2" name="valeur" value="2" /><label for="star2">★</label>
                             <input type="radio" id="star1" name="valeur" value="1" /><label for="star1">★</label>
                         </div>
-                        <button type="submit" class="btn btn-sm btn-dark px-4 rounded-pill fw-bold" style="background:#3e2723;">Voter</button>
+                        <textarea name="commentaire" class="form-control mb-3" rows="3" placeholder="Qu'avez-vous pensé de ce livre ?" style="border-radius: 20px; padding: 15px; border: 1px solid #e2e8f0; resize: none;"></textarea>
+                        <button type="submit" class="btn btn-dark-premium w-100 py-3">Envoyer mon avis</button>
                     </form>
                 </div>
+                {% endif %}
 
-                <!-- الأزرار -->
                 <div class="mt-5 d-flex gap-3">
-                    {% if disponible %}
-                        <a href="{% url 'reserver_livre' livre.id %}" class="btn btn-reserve btn-lg px-5 shadow-lg">
-                            <i class="fas fa-bookmark me-2"></i> Réserver
-                        </a>
-                    {% else %}
-                        <a href="{% url 'rejoindre_attente' livre.id %}" class="btn btn-warning btn-lg px-4 fw-bold">
-                            <i class="fas fa-bell me-2"></i> M'avertir
-                        </a>
+                    {% if not user.is_staff %}
+                        {% if disponible %}
+                            <a href="{% url 'reserver_livre' livre.id %}" class="btn btn-dark-premium">
+                                <i class="fas fa-bookmark me-2"></i> Réserver
+                            </a>
+                        {% else %}
+                            <a href="{% url 'rejoindre_attente' livre.id %}" class="btn btn-warning btn-lg px-4 fw-bold rounded-pill text-dark">
+                                <i class="fas fa-bell me-2"></i> M'avertir
+                            </a>
+                        {% endif %}
                     {% endif %}
-                    
                     <a href="{% url 'home' %}" class="btn btn-return-custom btn-lg px-5 shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Retour
                     </a>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- قسم التعليقات -->
+    <div class="avis-container" data-aos="fade-up">
+        <h4 class="fw-bold mb-4" style="color: #3e2723;">
+            <i class="fas fa-comments me-2 opacity-50"></i> Avis des lecteurs
+        </h4>
+        {% if livre.notes.all %}
+            {% for note in livre.notes.all|dictsortreversed:"id" %}
+            <div class="avis-item d-flex gap-3">
+                <div class="user-avatar shadow-sm">{{ note.etudiant.user.username|first|upper }}</div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: #2d1b17;">
+                                {{ note.etudiant.user.get_full_name|default:note.etudiant.user.username }}
+                                {% if note.etudiant.user == request.user %}
+                                    <span class="badge rounded-pill ms-2" style="background:#efebe9; color:#5d4037; font-size: 0.6rem;">VOUS</span>
+                                {% endif %}
+                            </h6>
+                            <div style="color: #f59e0b; font-size: 0.8rem;">
+                                {% for i in "12345" %}<i class="{% if forloop.counter <= note.valeur %}fas{% else %}far{% endif %} fa-star"></i>{% endfor %}
+                            </div>
+                        </div>
+                        {% if note.etudiant.user == request.user %}
+                            <a href="{% url 'supprimer_note' note.id %}" class="btn-delete-avis" onclick="return confirm('Supprimer ?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mt-2" style="font-style: italic; font-size: 0.95rem;">"{{ note.commentaire|default:"Note sans commentaire" }}"</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-4 opacity-50">
+                <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                <p>Aucun avis pour le moment.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

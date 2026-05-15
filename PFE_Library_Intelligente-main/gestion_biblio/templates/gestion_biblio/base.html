@@ -116,8 +116,13 @@
                         </a>
                         <a class="nav-link" href="/admin/">Administration</a>
                     {% else %}
+                        {% if not user.is_staff %}
                         <a class="nav-link" href="{% url 'mon_espace' %}">Mon Espace</a>
-                        <a class="nav-link text-primary fw-bold" href="{% url 'dashboard' %}">📊 Dashboard</a>
+                    {% endif %}
+                        {% if user.is_staff %}
+    <!-- هاد السطر غايبان غير لـ Admin أو الـ Staff -->
+                       <a class="nav-link" href="{% url 'dashboard' %}">📊 Dashboard</a>
+                                   {% endif %}
                         {% if user.is_superuser %}
                             <a class="nav-link text-warning fw-bold" href="/admin/">⚙️ Admin</a>
                         {% endif %}
@@ -132,7 +137,7 @@
         </div>
     </nav>
 
-    <div class="container py-5 min-vh-100" style="position: relative; z-index: 1;">
+    <div class="container min-vh-100" style="position: relative; z-index: 1; padding-top: 0 !important;">
         {% block content %}{% endblock %}
     </div>
 
@@ -206,7 +211,15 @@
 
         {% if messages %}
             {% for m in messages %}
-                Swal.fire({ icon: 'success', title: 'Notification', text: '{{ m }}', timer: 3000, showConfirmButton: false, toast: true, position: 'top-end' });
+                Swal.fire({ 
+                    icon: '{% if m.tags == "error" %}error{% elif m.tags == "warning" %}warning{% else %}success{% endif %}', 
+                    title: 'Notification', 
+                    text: "{{ m|safe }}", 
+                    timer: 3000, 
+                    showConfirmButton: false, 
+                    toast: true, 
+                    position: 'top-end' 
+                });
             {% endfor %}
         {% endif %}
     </script>
